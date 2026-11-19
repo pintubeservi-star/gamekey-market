@@ -27,7 +27,7 @@ def ai_status():
 def worker(job_id, source, seconds, ai_key):
     JOBS[job_id].update(status="processing", message="Preparando y analizando el video…")
     try:
-        result = make_clips(source, OUT, job_id, seconds, ai_key=ai_key)
+        result = make_clips(source, OUT, job_id, seconds, ai_key)
         if not result or not result.get("full_video"):
             raise RuntimeError("El procesador no pudo exportar el video completo.")
         clips = result.get("clips", [])
