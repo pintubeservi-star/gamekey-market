@@ -6,8 +6,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
-import android.widget.VideoView
-import android.widget.MediaController
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -305,23 +307,29 @@ fun ArtexStudio() {
 
 @Composable
 private fun VideoPreview(url: String) {
+    val context = LocalContext.current
+    val player = remember(url) {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(Uri.parse(url)))
+            playWhenReady = false
+            prepare()
+        }
+    }
+    DisposableEffect(player) {
+        onDispose { player.release() }
+    }
     AndroidView(
-        modifier = Modifier.fillMaxWidth().height(310.dp),
-        factory = { context ->
-            VideoView(context).apply {
-                tag = url
-                val controls = MediaController(context)
-                controls.setAnchorView(this)
-                setMediaController(controls)
-                setVideoURI(Uri.parse(url))
+        modifier = Modifier.fillMaxWidth().height(340.dp),
+        factory = { viewContext ->
+            PlayerView(viewContext).apply {
+                this.player = player
+                useController = true
+                controllerAutoShow = true
+                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING)
             }
         },
-        update = { view ->
-            if (view.tag != url) {
-                view.tag = url
-                view.setVideoURI(Uri.parse(url))
-            }
-        }
+        update = { view -> if (view.player !== player) view.player = player }
     )
 }
 
