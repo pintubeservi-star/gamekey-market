@@ -49,7 +49,7 @@ export default function ClipperPage() {
       <div className="max-w-3xl">
         <p className="mb-4 text-xs font-bold tracking-[.35em] text-cyan-300">CREA MÁS. EDITA MENOS.</p>
         <h1 className="text-4xl font-black leading-tight sm:text-6xl">Convierte videos largos en <span className="text-cyan-300">clips verticales.</span></h1>
-        <p className="mt-5 max-w-2xl text-lg text-slate-400">Sube un video que tengas derecho a utilizar. ARTEX analiza escenas, propone fragmentos y prepara clips listos para revisar y publicar.</p>
+        <p className="mt-5 max-w-2xl text-lg text-slate-400">Sube un video que tengas derecho a utilizar. ARTEX conserva y exporta el video completo en vertical, además de crear clips destacados para revisar y publicar.</p>
       </div>
       <div className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
         <div className="rounded-3xl border border-white/10 bg-[#11151e] p-6 sm:p-8">
@@ -80,11 +80,12 @@ export default function ClipperPage() {
         <aside className="space-y-4">
           <div className="rounded-3xl border border-white/10 bg-[#11151e] p-6">
             <Sparkles className="mb-4 text-cyan-300"/><h3 className="text-lg font-bold">Qué prepara</h3>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">{["Análisis visual Gemini cuando configures la clave","Selección de ganchos y momentos destacados","Fragmentos verticales 9:16 con audio","Descarga MP4 y revisión antes de publicar"].map(x=><li key={x} className="flex gap-2"><ShieldCheck size={17} className="shrink-0 text-cyan-300"/>{x}</li>)}</ul>
+            <ul className="mt-4 space-y-3 text-sm text-slate-300">{["Exportación del video completo sin saltarse el final","Análisis visual Gemini cuando configures la clave","Clips destacados en vertical 9:16 con audio","Descarga del video completo y de cada clip"].map(x=><li key={x} className="flex gap-2"><ShieldCheck size={17} className="shrink-0 text-cyan-300"/>{x}</li>)}</ul>
           </div>
           <div className="rounded-3xl border border-white/10 bg-[#11151e] p-6">
             <Activity className="mb-4 text-cyan-300"/><h3 className="text-lg font-bold">Estado del proyecto</h3>
             <p className="mt-2 text-sm text-slate-400">{job ? "ID: " + job.id : "Todavía no has iniciado un procesamiento."}</p>
+            {job?.full_video?.url && <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4"><div className="font-semibold text-cyan-200">Video completo terminado</div><p className="mt-1 text-xs text-slate-300">Duración original conservada: {Math.round(job.full_video.duration)} segundos · Formato vertical 9:16</p><a className="mt-3 inline-flex items-center gap-2 text-sm text-cyan-300 underline" href={API + job.full_video.url} target="_blank" rel="noreferrer"><Download size={15}/> Descargar video completo</a></div>}
             {job?.clips?.map((clip: any, i: number) => <div key={clip.id || i} className="mt-4 rounded-xl bg-black/30 p-3"><div className="flex items-center justify-between text-sm font-semibold"><span>Clip {i+1}</span><span className="text-cyan-300">{Math.round(clip.duration)}s</span></div><p className="mt-1 text-xs text-slate-500">{clip.start.toFixed(1)}s – {clip.end.toFixed(1)}s</p><a className="mt-3 inline-flex items-center gap-2 text-sm text-cyan-300 underline" href={API + clip.url} target="_blank" rel="noreferrer"><Download size={15}/> Descargar MP4</a></div>)}
           </div>
           <p className="px-2 text-xs leading-5 text-slate-500"><Clock3 className="mr-1 inline" size={13}/> Con Gemini configurado, la IA evalúa los fotogramas para proponer momentos destacados. No garantiza viralidad; revisa cada clip antes de publicarlo.</p>
