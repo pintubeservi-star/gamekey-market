@@ -54,7 +54,7 @@ fun Screen() {
     var selected by remember { mutableStateOf<Uri?>(null) }
     var rights by remember { mutableStateOf(false) }
     var seconds by remember { mutableFloatStateOf(60f) }
-    var api by remember { mutableStateOf("") }
+    var api by remember { mutableStateOf("https://artex-clipper-api-production.up.railway.app") }
     var status by remember { mutableStateOf("Configura la URL HTTPS de tu motor de procesamiento.") }
     var busy by remember { mutableStateOf(false) }
     var outputs by remember { mutableStateOf(listOf<String>()) }
