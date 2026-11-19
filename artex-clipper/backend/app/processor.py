@@ -1,4 +1,6 @@
-import base64, json, re, subprocess, urllib.request, urllib.error
+import base64, json, re, subprocess, urllib.request, urllib.error, logging
+
+log = logging.getLogger("artex.processor")
 from pathlib import Path
 
 GEMINI_MODEL = "gemini-3.1-flash-lite"
@@ -117,6 +119,7 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
             except Exception as exc:
                 engine = "local_fallback"
                 ai_warning = str(exc)[:500]
+                log.exception("Gemini analysis failed for job %s; using automatic fallback: %s", job_id, ai_warning)
                 segments = fallback_segments(duration, max_seconds)
         else:
             segments = fallback_segments(duration, max_seconds)
