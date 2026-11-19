@@ -1,6 +1,6 @@
 import os, uuid, shutil, subprocess, threading
 from pathlib import Path
-from fastapi import FastAPI, UploadFile, File, Header, HTTPException
+from fastapi import FastAPI, UploadFile, File, Header, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from .processor import make_clips
@@ -30,7 +30,7 @@ def worker(job_id, source, seconds):
         except Exception: pass
 
 @app.post("/api/jobs")
-async def create_job(file: UploadFile = File(...), max_clip_seconds: int = 60, x_content_rights: str = Header(default="")):
+async def create_job(file: UploadFile = File(...), max_clip_seconds: int = Form(default=60), x_content_rights: str = Header(default="")):
     if x_content_rights != "confirmed": raise HTTPException(400, "Confirma que tienes derechos para usar este video.")
     if not file.filename or Path(file.filename).suffix.lower() not in {".mp4",".mov",".mkv",".webm",".m4v"}:
         raise HTTPException(415, "Formato no compatible. Usa MP4, MOV, MKV o WEBM.")
