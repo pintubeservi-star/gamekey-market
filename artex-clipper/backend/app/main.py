@@ -8,7 +8,7 @@ from .processor import make_clips
 ROOT = Path(os.getenv("ARTEX_STORAGE", "/data"))
 INBOX, OUT = ROOT / "uploads", ROOT / "outputs"
 INBOX.mkdir(parents=True, exist_ok=True); OUT.mkdir(parents=True, exist_ok=True)
-MAX_MB = int(os.getenv("MAX_UPLOAD_MB", "800"))
+MAX_MB = int(os.getenv("MAX_UPLOAD_MB", "250"))
 JOBS = {}
 app = FastAPI(title="ARTEX CLIPPER API", version="0.2.0")
 origins = os.getenv("CORS_ORIGINS", "*").split(",")
