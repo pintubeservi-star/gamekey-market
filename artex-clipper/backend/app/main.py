@@ -1,4 +1,4 @@
-import os, uuid, shutil, threading
+import os, uuid, shutil, threading, logging
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Header, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +10,7 @@ INBOX, OUT = ROOT / "uploads", ROOT / "outputs"
 INBOX.mkdir(parents=True, exist_ok=True); OUT.mkdir(parents=True, exist_ok=True)
 MAX_MB = int(os.getenv("MAX_UPLOAD_MB", "250"))
 JOBS = {}
+log = logging.getLogger('artex')
 app = FastAPI(title="ARTEX CLIPPER AI", version="0.3.0")
 origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["*"], allow_headers=["*"])
@@ -17,7 +18,7 @@ app.mount("/outputs", StaticFiles(directory=str(OUT)), name="outputs")
 
 @app.get("/health")
 def health():
-    return {"ok": True, "service": "artex-clipper", "video_engine": "ffmpeg", "ai_model": GEMINI_MODEL, "ai_key_required": True, "ai_mode": "gemini-vision-with-local-fallback"}
+    return {"ok": True, "service": "artex-clipper", "video_engine": "ffmpeg", "ai_model": GEMINI_MODEL, "ai_key_required": False, "ai_mode": "gemini-vision-with-local-fallback"}
 
 @app.get("/api/ai/status")
 def ai_status():
@@ -34,6 +35,7 @@ def worker(job_id, source, seconds, ai_key):
         message = "Video completo exportado y mejores momentos seleccionados con Gemini" if engine == "gemini" else "Video completo exportado; clips divididos automáticamente."
         JOBS[job_id].update(status="completed", message=message, clips=clips, full_video=result["full_video"], source_duration=result.get("source_duration"), engine=engine, ai_warning=result.get("ai_warning"))
     except Exception as exc:
+        log.exception("ARTEX job %s failed", job_id)
         JOBS[job_id].update(status="failed", error=str(exc), message="No se pudo procesar el video")
     finally:
         try: Path(source).unlink(missing_ok=True)
@@ -57,9 +59,12 @@ async def create_job(file: UploadFile = File(...), max_clip_seconds: int = Form(
                 out.write(chunk)
     except Exception:
         target.unlink(missing_ok=True); raise
-    JOBS[job_id] = {"id": job_id, "status":"queued", "message":"Video recibido", "clips":[], "engine":("gemini" if ai_key else "local")}
-    threading.Thread(target=worker, args=(job_id, str(target), max_clip_seconds, ai_key), daemon=True).start()
-    return JOBS[job_id]
+    # Return a stable queued snapshot so Android always starts polling.
+    initial = {"id": job_id, "status":"queued", "message":"Video recibido; preparando exportación.", "clips":[], "engine":("gemini" if ai_key else "local")}
+    JOBS[job_id] = dict(initial)
+    thread = threading.Thread(target=worker, args=(job_id, str(target), max_clip_seconds, ai_key), daemon=True)
+    thread.start()
+    return initial
 
 @app.get("/api/jobs/{job_id}")
 def get_job(job_id: str):
