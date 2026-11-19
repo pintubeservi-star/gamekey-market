@@ -31,8 +31,8 @@ def worker(job_id, source, seconds, ai_key):
             raise RuntimeError("El procesador no pudo exportar el video completo.")
         clips = result.get("clips", [])
         engine = result.get("engine", "local")
-        message = "Video completo exportado y mejores momentos seleccionados con Gemini" if engine == "gemini" else "Video completo exportado; clips divididos automáticamente. Conecta Gemini para selección inteligente."
-        JOBS[job_id].update(status="completed", message=message, clips=clips, full_video=result["full_video"], source_duration=result.get("source_duration"), engine=engine)
+        message = "Video completo exportado y mejores momentos seleccionados con Gemini" if engine == "gemini" else "Video completo exportado; clips divididos automáticamente."
+        JOBS[job_id].update(status="completed", message=message, clips=clips, full_video=result["full_video"], source_duration=result.get("source_duration"), engine=engine, ai_warning=result.get("ai_warning"))
     except Exception as exc:
         JOBS[job_id].update(status="failed", error=str(exc), message="No se pudo procesar el video")
     finally:
