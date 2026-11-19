@@ -130,7 +130,7 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
             if not dest.exists() or dest.stat().st_size < 1024:
                 raise RuntimeError("FFmpeg no generó un archivo de video válido.")
             results.append({"id":name,"start":start,"end":end,"duration":end-start,"score":segment["score"],"hook":segment["hook"],"reason":segment["reason"],"caption":segment["caption"],"engine":engine,"url":"/outputs/"+name})
-        return {"clips": results, "full_video": {"id": full_name, "duration": duration, "url": "/outputs/" + full_name}, "source_duration": duration, "engine": engine}
+        return {"clips": results, "full_video": {"id": full_name, "duration": duration, "url": "/outputs/" + full_name}, "source_duration": duration, "engine": engine, "ai_warning": ai_warning}
     finally:
         for item in temp_dir.glob("*"):
             item.unlink(missing_ok=True)
