@@ -26,11 +26,13 @@ def ai_status():
 def worker(job_id, source, seconds, ai_key):
     JOBS[job_id].update(status="processing", message="Preparando y analizando el video…")
     try:
-        clips = make_clips(source, OUT, job_id, seconds, ai_key=ai_key)
-        if not clips:
-            raise RuntimeError("El procesador terminó sin generar clips.")
-        engine = clips[0].get("engine", "local")
-        JOBS[job_id].update(status="completed", message=("Análisis visual con Gemini terminado" if engine == "gemini" else "Clips creados con motor local; conecta Gemini para selección inteligente"), clips=clips, engine=engine)
+        result = make_clips(source, OUT, job_id, seconds, ai_key=ai_key)
+        if not result or not result.get("full_video"):
+            raise RuntimeError("El procesador no pudo exportar el video completo.")
+        clips = result.get("clips", [])
+        engine = result.get("engine", "local")
+        message = "Video completo exportado y mejores momentos seleccionados con Gemini" if engine == "gemini" else "Video completo exportado; clips divididos automáticamente. Conecta Gemini para selección inteligente."
+        JOBS[job_id].update(status="completed", message=message, clips=clips, full_video=result["full_video"], source_duration=result.get("source_duration"), engine=engine)
     except Exception as exc:
         JOBS[job_id].update(status="failed", error=str(exc), message="No se pudo procesar el video")
     finally:
