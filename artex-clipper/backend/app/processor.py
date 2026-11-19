@@ -33,15 +33,15 @@ def gemini_segments(source, temp_dir, duration, max_seconds, api_key):
     prompt = (
         "Eres ARTEX, un editor experto de videos cortos para TikTok, Reels y Shorts. "
         "Analiza los fotogramas del video en el orden recibido. Cada imagen viene precedida "
-        "por su tiempo exacto en segundos. Encuentra hasta 8 fragmentos consecutivos que tengan "
+        "por su tiempo exacto en segundos. Encuentra los 8 mejores fragmentos consecutivos que tengan "
         "un gancho visual, acción, emoción, sorpresa, humor, transformación, explicación útil, una acción o una historia que se entienda visualmente. "
         "o una historia que se entienda. No inventes diálogo ni eventos fuera de los fotogramas. "
         "Prioriza inicios que atrapen y finales que dejen una idea completa. "
         f"Duración total: {duration:.2f}s. Duración máxima por clip: {max_seconds}s. "
         "Devuelve SOLO JSON válido con esta forma: "
         '{"clips":[{"start":0.0,"end":25.0,"score":92,"hook":"...","reason":"...","caption":"..."}]}. '
-        "Los tiempos deben estar dentro del video, end mayor que start, cada clip entre 8 segundos "
-        "y el máximo indicado. No devuelvas markdown. Si no hay momentos diferenciados, selecciona "
+        "Los tiempos deben estar dentro del video, end mayor que start, cada clip entre 3 segundos "
+        "y el máximo indicado. Devuelve hasta 8 fragmentos destacados, ordenados por puntuación. No devuelvas markdown. Si no hay momentos diferenciados, selecciona "
         "los mejores intervalos disponibles y explica honestamente la razón."
     )
     parts = [{"text": prompt}]
@@ -87,7 +87,7 @@ def fallback_segments(duration, max_seconds):
         return [{"start":0.0,"end":duration,"score":50,"hook":"Fragmento del video","reason":"Selección automática por duración; IA semántica no configurada.","caption":""}]
     clips = []
     start = 0.0
-    while start < duration and len(clips) < 8:
+    while start < duration:
         end = min(duration, start + max_seconds)
         if end - start >= 3:
             clips.append({"start":start,"end":end,"score":50,"hook":"Fragmento del video","reason":"Selección automática por duración; IA semántica no configurada.","caption":""})
@@ -108,6 +108,12 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
                 raise RuntimeError("La IA no encontró fragmentos válidos. Prueba con otro video.")
         else:
             segments = fallback_segments(duration, max_seconds)
+        # Exporta el video entero, desde el primer segundo hasta el final, además de los clips.
+        full_name = f"{job_id}_video_completo.mp4"
+        full_dest = out_dir / full_name
+        run(["ffmpeg","-y","-i",source,"-map","0:v:0","-map","0:a?","-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1","-c:v","libx264","-preset","veryfast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",str(full_dest)])
+        if not full_dest.exists() or full_dest.stat().st_size < 1024:
+            raise RuntimeError("No se pudo exportar el video completo.")
         results = []
         for idx, segment in enumerate(segments):
             name = f"{job_id}_{idx+1}.mp4"
@@ -118,7 +124,7 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
             if not dest.exists() or dest.stat().st_size < 1024:
                 raise RuntimeError("FFmpeg no generó un archivo de video válido.")
             results.append({"id":name,"start":start,"end":end,"duration":end-start,"score":segment["score"],"hook":segment["hook"],"reason":segment["reason"],"caption":segment["caption"],"engine":engine,"url":"/outputs/"+name})
-        return results
+        return {"clips": results, "full_video": {"id": full_name, "duration": duration, "url": "/outputs/" + full_name}, "source_duration": duration, "engine": engine}
     finally:
         for item in temp_dir.glob("*"):
             item.unlink(missing_ok=True)
