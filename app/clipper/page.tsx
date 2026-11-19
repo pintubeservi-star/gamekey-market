@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Upload, Scissors, Sparkles, Film, Download, ShieldCheck, Activity, Clock3 } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_ARTEX_API_URL || "";
+const API = process.env.NEXT_PUBLIC_ARTEX_API_URL || "https://artex-clipper-api-production.up.railway.app";
 
 export default function ClipperPage() {
   const [file, setFile] = useState<File | null>(null);
