@@ -33,7 +33,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.RequestBody
+import okio.BufferedSink
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -167,11 +168,17 @@ fun ArtexStudio() {
                                 outputs = emptyList()
                                 try {
                                     val result = withContext(Dispatchers.IO) {
-                                        val fileBytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: error("No se pudo leer el video.")
                                         val mime = context.contentResolver.getType(uri) ?: "video/mp4"
+                                        val videoBody = object : RequestBody() {
+                                            override fun contentType() = mime.toMediaTypeOrNull()
+                                            override fun contentLength(): Long = runCatching { context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L }.getOrDefault(-1L)
+                                            override fun writeTo(sink: BufferedSink) {
+                                                context.contentResolver.openInputStream(uri)?.use { input -> input.copyTo(sink.outputStream()) } ?: error("No se pudo leer el video.")
+                                            }
+                                        }
                                         val body = MultipartBody.Builder().setType(MultipartBody.FORM)
                                             .addFormDataPart("max_clip_seconds", seconds.toInt().toString())
-                                            .addFormDataPart("file", fileName.ifBlank { "video.mp4" }, fileBytes.toRequestBody(mime.toMediaTypeOrNull()))
+                                            .addFormDataPart("file", fileName.ifBlank { "video.mp4" }, videoBody)
                                             .build()
                                         val req = Request.Builder().url("$API_BASE/api/jobs").header("X-Content-Rights", "confirmed").apply { if (geminiKey.isNotBlank()) header("X-Gemini-Api-Key", geminiKey.trim()) }.post(body).build()
                                         var state = http.newCall(req).execute().use { r ->
@@ -263,7 +270,7 @@ fun ArtexStudio() {
                     }
                 }) { Text(if (checking) "…" else "Probar", color = cyan, fontSize = 11.sp) }
             }
-            Text("ARTEX CLIPPER AI · Gemini analiza visualmente los fotogramas cuando añades una clave gratuita. Sin clave funciona el motor local básico. Revisa siempre los resultados antes de publicar.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
+            Text("ARTEX CLIPPER AI · Gemini analiza imagen y audio cuando añades una clave gratuita. Sin clave funciona el motor local básico. Revisa siempre los resultados antes de publicar.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
             Spacer(Modifier.height(12.dp))
         }
     }
