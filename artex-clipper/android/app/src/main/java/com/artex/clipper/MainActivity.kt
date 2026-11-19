@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.widget.VideoView
+import android.widget.MediaController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -241,12 +244,15 @@ fun ArtexStudio() {
 
             if (fullVideoUrl != null) {
                 Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF153D4B))) {
-                    Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text("VIDEO COMPLETO TERMINADO", color = cyan, fontWeight = FontWeight.Black, fontSize = 12.sp)
-                            Text("Desde el inicio hasta el último segundo · vertical MP4", color = Color.White, fontSize = 10.sp)
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text("VIDEO COMPLETO TERMINADO", color = cyan, fontWeight = FontWeight.Black, fontSize = 12.sp)
+                                Text("Desde el inicio hasta el último segundo · vertical MP4", color = Color.White, fontSize = 10.sp)
+                            }
+                            Button(onClick = { downloadFullVideo(context, fullVideoUrl!!) }, shape = RoundedCornerShape(11.dp)) { Text("Descargar") }
                         }
-                        Button(onClick = { downloadFullVideo(context, fullVideoUrl!!) }, shape = RoundedCornerShape(11.dp)) { Text("Guardar") }
+                        VideoPreview(fullVideoUrl!!)
                     }
                 }
             }
@@ -254,16 +260,19 @@ fun ArtexStudio() {
                 Text("TUS CLIPS  ·  ${outputs.size} RESULTADOS", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 outputs.forEachIndexed { index, url ->
                     Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = panel)) {
-                        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(42.dp).background(Color(0xFF183641), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Text("▶", color = cyan, fontSize = 16.sp) }
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text("Clip ${index + 1}", color = Color.White, fontWeight = FontWeight.SemiBold)
-                                Text("Video vertical · MP4", color = muted, fontSize = 11.sp)
+                        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(Modifier.size(42.dp).background(Color(0xFF183641), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Text("▶", color = cyan, fontSize = 16.sp) }
+                                Spacer(Modifier.width(12.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text("Clip ${index + 1}", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                    Text("Video vertical · MP4", color = muted, fontSize = 11.sp)
+                                }
+                                Button(onClick = { downloadClip(context, url, index + 1) }, shape = RoundedCornerShape(11.dp), contentPadding = PaddingValues(horizontal = 13.dp, vertical = 8.dp)) {
+                                    Text("Descargar", fontSize = 12.sp)
+                                }
                             }
-                            Button(onClick = { downloadClip(context, url, index + 1) }, shape = RoundedCornerShape(11.dp), contentPadding = PaddingValues(horizontal = 13.dp, vertical = 8.dp)) {
-                                Text("Guardar", fontSize = 12.sp)
-                            }
+                            VideoPreview(url)
                         }
                     }
                 }
@@ -292,6 +301,28 @@ fun ArtexStudio() {
             Spacer(Modifier.height(12.dp))
         }
     }
+}
+
+@Composable
+private fun VideoPreview(url: String) {
+    AndroidView(
+        modifier = Modifier.fillMaxWidth().height(310.dp),
+        factory = { context ->
+            VideoView(context).apply {
+                tag = url
+                val controls = MediaController(context)
+                controls.setAnchorView(this)
+                setMediaController(controls)
+                setVideoURI(Uri.parse(url))
+            }
+        },
+        update = { view ->
+            if (view.tag != url) {
+                view.tag = url
+                view.setVideoURI(Uri.parse(url))
+            }
+        }
+    )
 }
 
 @Composable
