@@ -106,7 +106,7 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
         # Primero asegura una exportación íntegra: un fallo de IA nunca debe borrar el video final.
         full_name = f"{job_id}_video_completo.mp4"
         full_dest = out_dir / full_name
-        run(["ffmpeg","-y","-i",source,"-map","0:v:0","-map","0:a?","-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1","-c:v","libx264","-preset","veryfast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",str(full_dest)])
+        run(["ffmpeg","-y","-i",source,"-map","0:v:0","-map","0:a?","-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1","-c:v","libx264","-threads","2","-preset","veryfast","-pix_fmt","yuv420p","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",str(full_dest)])
         if not full_dest.exists() or full_dest.stat().st_size < 1024:
             raise RuntimeError("No se pudo exportar el video completo.")
         if api_key:
@@ -126,7 +126,7 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
             dest = out_dir / name
             start, end = segment["start"], segment["end"]
             # Escalado vertical con recorte centrado y conservación de audio cuando existe.
-            run(["ffmpeg","-y","-ss",str(start),"-i",source,"-t",str(end-start),"-map","0:v:0","-map","0:a?","-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920","-c:v","libx264","-preset","veryfast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",str(dest)])
+            run(["ffmpeg","-y","-ss",str(start),"-i",source,"-t",str(end-start),"-map","0:v:0","-map","0:a?","-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920","-c:v","libx264","-threads","2","-preset","veryfast","-pix_fmt","yuv420p","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",str(dest)])
             if not dest.exists() or dest.stat().st_size < 1024:
                 raise RuntimeError("FFmpeg no generó un archivo de video válido.")
             results.append({"id":name,"start":start,"end":end,"duration":end-start,"score":segment["score"],"hook":segment["hook"],"reason":segment["reason"],"caption":segment["caption"],"engine":engine,"url":"/outputs/"+name})
