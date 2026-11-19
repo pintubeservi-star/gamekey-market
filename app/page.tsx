@@ -5,7 +5,7 @@ import { ArrowRight, BadgeCheck, Check, ChevronDown, Gamepad2, Headphones, Menu,
 
 type Product = { id: number; name: string; platform: string; category: string; price: number; oldPrice?: number; tag: string; image: string; description: string };
 const products: Product[] = [
-  { id: 1, name: "Grand Theft Auto VI", platform: "PS5 · Xbox Series X|S", category: "Acción", price: 5, tag: "DESTACADO", image: "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=85", description: "Ficha de demostración. No incluye código, licencia ni acceso al videojuego." },
+  { id: 1, name: "Grand Theft Auto VI", platform: "PS5 · Xbox Series X|S", category: "Acción", price: 5, tag: "DESTACADO", image: "https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_14.10e7v.06pcm_t.jpg?akim=1&imdensity=1&imwidth=1600", description: "Ficha de demostración. No incluye código, licencia ni acceso al videojuego." },
   { id: 2, name: "Cyberpunk 2077", platform: "PC · PS5 · Xbox", category: "RPG", price: 19.99, oldPrice: 39.99, tag: "OFERTA DEMO", image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=900&q=85", description: "Producto de muestra para probar la experiencia de catálogo." },
   { id: 3, name: "Elden Ring", platform: "PC · PS5 · Xbox", category: "Aventura", price: 29.99, tag: "POPULAR", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=85", description: "Producto de muestra para probar la experiencia de catálogo." },
   { id: 4, name: "Forza Horizon", platform: "PC · Xbox", category: "Carreras", price: 24.99, tag: "RECOMENDADO", image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=85", description: "Producto de muestra para probar la experiencia de catálogo." },
@@ -39,9 +39,9 @@ export default function Home() {
 
   return (
     <main className="site-shell">
-      <div className="announcement"><Sparkles size={13}/> EXPERIENCIA DE TIENDA DIGITAL · PROTOTIPO INTERACTIVO <span>NO SE REALIZAN COBROS REALES</span></div>
+      <div className="announcement"><Sparkles size={13}/> VICE CITY EDITION · GAMEKEY MARKET <span>NO SE REALIZAN COBROS REALES</span></div>
       <header className="header">
-        <button className="brand" onClick={() => nav("home")}><span className="brand-mark"><Gamepad2 size={22}/></span><span>GAMEKEY<span className="brand-light"> MARKET</span><small>DIGITAL GAME STORE</small></span></button>
+        <button className="brand" onClick={() => nav("home")}><span className="brand-mark"><Gamepad2 size={22}/></span><span>GAMEKEY<span className="brand-light"> MARKET</span><small>VICE CITY DIGITAL DISTRICT</small></span></button>
         <nav className={mobileMenu ? "nav open" : "nav"}>
           <button className={view === "home" ? "active" : ""} onClick={() => nav("home")}>Inicio</button>
           <button className={view === "catalog" ? "active" : ""} onClick={() => nav("catalog")}>Videojuegos</button>
@@ -58,22 +58,30 @@ export default function Home() {
         <section className="hero">
           <div className="hero-bg"/>
           <div className="hero-content">
-            <div className="eyebrow"><span/> EL UNIVERSO GAMING TE ESPERA</div>
-            <p className="hero-kicker">PRÓXIMA GENERACIÓN. NUEVAS HISTORIAS.</p>
-            <h1>PLAY THE<br/><em>NEXT LEVEL.</em></h1>
-            <p className="hero-copy">Descubre títulos destacados, explora plataformas y encuentra tu próxima aventura.</p>
-            <div className="hero-buttons"><button className="primary-btn" onClick={() => nav("catalog")}>EXPLORAR CATÁLOGO <ArrowRight size={17}/></button><button className="text-btn" onClick={() => {setSelected(products[0]);setPlatform("PS5");}}>VER DESTACADO <ChevronDown size={16}/></button></div>
+            <div className="eyebrow"><span/> BIENVENIDO A LEONIDA</div>
+            <p className="hero-kicker">UNA CIUDAD. MIL HISTORIAS. NINGUNA REGLA.</p>
+            <h1>WELCOME TO<br/><em>VICE CITY.</em></h1>
+            <p className="hero-copy">Luces de neón, calles interminables y una nueva generación de videojuegos. Explora el catálogo desde el corazón de Vice City.</p>
+            <div className="hero-buttons"><button className="primary-btn" onClick={() => nav("catalog")}>ENTRAR A LA TIENDA <ArrowRight size={17}/></button><button className="text-btn" onClick={() => {setSelected(products[0]);setPlatform("PS5");}}>VER DESTACADO <ChevronDown size={16}/></button></div>
             <div className="hero-proof"><span><ShieldCheck size={15}/> Catálogo organizado</span><span><Zap size={15}/> Experiencia digital</span></div>
           </div>
           <div className="hero-side-note">GAMEKEY MARKET <span>01 / 04</span></div>
-          <div className="hero-bottom"><span>DISCOVER · CHOOSE · PLAY</span><span>SCROLL TO EXPLORE ↓</span></div>
+          <div className="hero-bottom"><span>VICE CITY · LEONIDA · AFTER DARK</span><span>EXPLORE THE CITY ↓</span></div>
+        </section>
+        <section className="vice-gallery">
+          <div className="vice-gallery-heading"><span>EXPLORE LEONIDA</span><b>THE CITY IS YOURS</b><small>UNA EXPERIENCIA VISUAL INSPIRADA EN GTA VI</small></div>
+          <div className="vice-gallery-grid">
+            <div className="vice-scene scene-city"><img src="https://www.rockstargames.com/VI/_next/static/media/Vice_City_13.0iq8ff474tsdx.jpg?akim=1&imdensity=1&imwidth=1600" alt="Vice City en GTA VI"/><span>01 / VICE CITY</span></div>
+            <div className="vice-scene scene-coast"><img src="https://www.rockstargames.com/VI/_next/static/media/Leonida_Keys_07.0z9tb69ssp4rq.jpg?akim=1&imdensity=1&imwidth=1600" alt="Leonida Keys en GTA VI"/><span>02 / LEONIDA KEYS</span></div>
+            <div className="vice-scene scene-duo"><img src="https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_14.10e7v.06pcm_t.jpg?akim=1&imdensity=1&imwidth=1600" alt="Jason y Lucia en GTA VI"/><span>03 / JASON & LUCIA</span></div>
+          </div>
         </section>
         <section className="trust-strip"><div><ShieldCheck/><span><b>Compra transparente</b><small>Información clara del producto</small></span></div><div><Zap/><span><b>Experiencia digital</b><small>Flujo de compra simplificado</small></span></div><div><Headphones/><span><b>Atención al cliente</b><small>Soporte y seguimiento</small></span></div><div><BadgeCheck/><span><b>Productos verificables</b><small>Licencias sujetas a proveedor</small></span></div></section>
         <section className="section">
-          <div className="section-heading"><div><div className="eyebrow">SELECCIÓN GAMEKEY</div><h2>JUEGOS <em>DESTACADOS</em></h2><p>Una muestra del catálogo que tendrá la tienda.</p></div><button className="view-all" onClick={() => nav("catalog")}>VER CATÁLOGO <ArrowRight size={16}/></button></div>
+          <div className="section-heading"><div><div className="eyebrow">THE VICE CITY COLLECTION</div><h2>ELIGE TU <em>PRÓXIMA MISIÓN</em></h2><p>Explora títulos destacados en una experiencia inspirada en el universo urbano de GTA VI.</p></div><button className="view-all" onClick={() => nav("catalog")}>VER CATÁLOGO <ArrowRight size={16}/></button></div>
           <div className="product-grid">{products.slice(0,3).map(p => <ProductCard key={p.id} product={p} onClick={() => setSelected(p)}/>)}</div>
         </section>
-        <section className="promo-band"><div><div className="eyebrow">TU PRÓXIMA AVENTURA</div><h2>ELIGE TU JUEGO.<br/><em>PREPARA EL MANDO.</em></h2><p>Explora por género y plataforma desde un solo lugar.</p></div><button className="primary-btn" onClick={() => nav("catalog")}>DESCUBRIR JUEGOS <ArrowRight size={17}/></button></section>
+        <section className="promo-band"><div><div className="eyebrow">LA CIUDAD NUNCA DUERME</div><h2>LAS CALLES TE ESPERAN.<br/><em>¿CUÁL ES TU SIGUIENTE JUEGO?</em></h2><p>Explora por género y plataforma desde un solo lugar.</p></div><button className="primary-btn" onClick={() => nav("catalog")}>DESCUBRIR JUEGOS <ArrowRight size={17}/></button></section>
       </>}
 
       {view === "catalog" && <section className="section page-section"><div className="eyebrow">GAMEKEY MARKET / CATÁLOGO</div><h2>EXPLORA <em>VIDEOJUEGOS</em></h2><p className="muted">Productos de muestra para evaluar la tienda.</p><div className="catalog-tools"><div className="search-field"><Search size={18}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar videojuegos..."/></div><div className="chips">{["Todos","Acción","RPG","Aventura","Carreras"].map(c => <button className={category===c?"chip selected":"chip"} key={c} onClick={() => setCategory(c)}>{c}</button>)}</div></div><div className="product-grid">{filtered.map(p => <ProductCard key={p.id} product={p} onClick={() => setSelected(p)}/>)}</div>{filtered.length===0 && <p className="empty">No encontramos productos con esa búsqueda.</p>}</section>}
@@ -86,7 +94,7 @@ export default function Home() {
 
       {view === "admin" && <section className="section page-section"><div className="eyebrow">GAMEKEY MARKET / ADMINISTRACIÓN</div><h2>PANEL <em>DE CONTROL</em></h2><div className="admin-grid"><div className="admin-card"><span>Productos de muestra</span><b>04</b></div><div className="admin-card"><span>Artículos en carrito actual</span><b>{cart.length}</b></div><div className="admin-card"><span>Estado de pagos</span><b>OFF</b></div></div><div className="demo-alert">Panel demostrativo. No existe inventario de licencias ni pedidos reales conectados.</div></section>}
 
-      <footer className="footer"><div className="footer-top"><div className="brand footer-brand"><span className="brand-mark"><Gamepad2 size={22}/></span><span>GAMEKEY<span className="brand-light"> MARKET</span><small>DIGITAL GAME STORE</small></span></div><p>Tu espacio para descubrir videojuegos.</p><button className="footer-admin" onClick={() => nav("admin")}>Panel demo</button></div><div className="footer-bottom"><span>© 2026 GAMEKEY MARKET · PROTOTIPO</span><span>Independiente. No afiliado a Rockstar Games ni a otros editores.</span></div></footer>
+      <footer className="footer"><div className="footer-top"><div className="brand footer-brand"><span className="brand-mark"><Gamepad2 size={22}/></span><span>GAMEKEY<span className="brand-light"> MARKET</span><small>DIGITAL GAME STORE</small></span></div><p>Una experiencia de tienda digital con estética Vice City.</p><button className="footer-admin" onClick={() => nav("admin")}>Panel demo</button></div><div className="footer-bottom"><span>© 2026 GAMEKEY MARKET · PROTOTIPO</span><span>Independiente. No afiliado a Rockstar Games ni a otros editores.</span></div></footer>
 
       {selected && <div className="modal-backdrop" onClick={() => setSelected(null)}><div className="product-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={() => setSelected(null)}><X/></button><img className="modal-image" src={selected.image} alt=""/><div className="modal-body"><div className="eyebrow">{selected.tag} · FICHA DE DEMOSTRACIÓN</div><h2>{selected.name}</h2><p>{selected.description}</p><div className="platform-picker"><label>Plataforma</label><div className="chips">{(selected.id===1?["PS5","Xbox"]:["PC","PS5","Xbox"]).map(p=><button className={platform===p?"chip selected":"chip"} key={p} onClick={()=>setPlatform(p)}>{p}</button>)}</div></div><div className="platform-picker"><label>Edición</label><div className="chips">{["Estándar","Deluxe"].map(e=><button className={edition===e?"chip selected":"chip"} key={e} onClick={()=>setEdition(e)}>{e}</button>)}</div></div><div className="modal-buy"><strong>{money(selected.price)}</strong><button className="primary-btn" onClick={() => addToCart(selected)}>AÑADIR AL CARRITO <ShoppingCart size={16}/></button></div><div className="demo-alert"><ShieldCheck size={17}/> Producto demostrativo: no incluye licencia ni código de activación.</div></div></div></div>}
       {notice && <div className="toast"><Check size={17}/>{notice}</div>}
