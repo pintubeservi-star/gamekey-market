@@ -203,11 +203,12 @@ fun ArtexStudio() {
                                         val clips = state.getJSONArray("clips")
                                         val clipUrls = (0 until clips.length()).map { API_BASE + clips.getJSONObject(it).getString("url") }
                                         val full = state.optJSONObject("full_video")?.optString("url")?.takeIf { it.isNotBlank() }?.let { API_BASE + it }
-                                        Pair(clipUrls, full)
+                                        val aiWarning = state.optString("ai_warning")
+                                        Pair(clipUrls, full to aiWarning)
                                     }
                                     outputs = result.first
-                                    fullVideoUrl = result.second
-                                    status = "Video completo terminado. " + result.first.size + " clips adicionales creados."
+                                    fullVideoUrl = result.second.first
+                                    status = "Video completo terminado. " + result.first.size + " clips adicionales creados." + if (result.second.second.isNotBlank()) " La IA falló y se usó el modo automático." else ""
                                 } catch (e: Exception) {
                                     status = e.message ?: "Ocurrió un error procesando el video."
                                 } finally { busy = false }
