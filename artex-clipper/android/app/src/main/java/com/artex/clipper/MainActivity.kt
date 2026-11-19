@@ -72,6 +72,7 @@ fun ArtexStudio() {
     var checking by remember { mutableStateOf(false) }
     var serverOnline by remember { mutableStateOf<Boolean?>(null) }
     var outputs by remember { mutableStateOf(listOf<String>()) }
+    var fullVideoUrl by remember { mutableStateOf<String?>(null) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         selected = uri
@@ -83,6 +84,7 @@ fun ArtexStudio() {
             } ?: "video seleccionado"
             status = "Video seleccionado. Confirma tus derechos para continuar."
             outputs = emptyList()
+            fullVideoUrl = null
         }
     }
 
@@ -166,6 +168,7 @@ fun ArtexStudio() {
                                 busy = true
                                 status = "Subiendo video al estudio…"
                                 outputs = emptyList()
+                                fullVideoUrl = null
                                 try {
                                     val result = withContext(Dispatchers.IO) {
                                         val mime = context.contentResolver.getType(uri) ?: "video/mp4"
@@ -198,10 +201,13 @@ fun ArtexStudio() {
                                         }
                                         if (state.optString("status") != "completed") error(state.optString("error", "El procesamiento no pudo completarse."))
                                         val clips = state.getJSONArray("clips")
-                                        (0 until clips.length()).map { API_BASE + clips.getJSONObject(it).getString("url") }
+                                        val clipUrls = (0 until clips.length()).map { API_BASE + clips.getJSONObject(it).getString("url") }
+                                        val full = state.optJSONObject("full_video")?.optString("url")?.takeIf { it.isNotBlank() }?.let { API_BASE + it }
+                                        Pair(clipUrls, full)
                                     }
-                                    outputs = result
-                                    status = "Proceso terminado. ${result.size} clips creados."
+                                    outputs = result.first
+                                    fullVideoUrl = result.second
+                                    status = "Video completo terminado. " + result.first.size + " clips adicionales creados."
                                 } catch (e: Exception) {
                                     status = e.message ?: "Ocurrió un error procesando el video."
                                 } finally { busy = false }
@@ -224,14 +230,25 @@ fun ArtexStudio() {
             Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF101A27))) {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.size(8.dp).background(if (busy) Color(0xFFFFC857) else if (outputs.isNotEmpty()) cyan else Color(0xFF77869B), CircleShape))
+                        Box(Modifier.size(8.dp).background(if (busy) Color(0xFFFFC857) else if (outputs.isNotEmpty() || fullVideoUrl != null) cyan else Color(0xFF77869B), CircleShape))
                         Spacer(Modifier.width(9.dp))
                         Text("ESTADO DEL PROYECTO", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     }
-                    Text(status, color = if (outputs.isNotEmpty()) cyan else Color(0xFFD5DEEA), fontSize = 13.sp, lineHeight = 19.sp)
+                    Text(status, color = if (outputs.isNotEmpty() || fullVideoUrl != null) cyan else Color(0xFFD5DEEA), fontSize = 13.sp, lineHeight = 19.sp)
                 }
             }
 
+            if (fullVideoUrl != null) {
+                Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF153D4B))) {
+                    Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text("VIDEO COMPLETO TERMINADO", color = cyan, fontWeight = FontWeight.Black, fontSize = 12.sp)
+                            Text("Desde el inicio hasta el último segundo · vertical MP4", color = Color.White, fontSize = 10.sp)
+                        }
+                        Button(onClick = { downloadFullVideo(context, fullVideoUrl!!) }, shape = RoundedCornerShape(11.dp)) { Text("Guardar") }
+                    }
+                }
+            }
             if (outputs.isNotEmpty()) {
                 Text("TUS CLIPS  ·  ${outputs.size} RESULTADOS", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 outputs.forEachIndexed { index, url ->
@@ -270,7 +287,7 @@ fun ArtexStudio() {
                     }
                 }) { Text(if (checking) "…" else "Probar", color = cyan, fontSize = 11.sp) }
             }
-            Text("ARTEX CLIPPER AI · Gemini analiza fotogramas y selecciona momentos visualmente interesantes cuando añades una clave gratuita. Sin clave funciona el motor local básico. Revisa siempre los resultados antes de publicar.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
+            Text("ARTEX CLIPPER AI · Exporta el video completo y crea clips adicionales. Gemini analiza fotogramas cuando configuras una clave gratuita.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
             Spacer(Modifier.height(12.dp))
         }
     }
@@ -290,6 +307,18 @@ private fun downloadClip(context: Context, url: String, number: Int) {
         .setMimeType("video/mp4")
         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "ARTEX_clip_$number.mp4")
+        .setAllowedOverMetered(true)
+        .setAllowedOverRoaming(false)
+    (context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).enqueue(request)
+}
+
+private fun downloadFullVideo(context: Context, url: String) {
+    val request = DownloadManager.Request(Uri.parse(url))
+        .setTitle("ARTEX CLIPPER · Video completo")
+        .setDescription("Guardando el video completo en Descargas")
+        .setMimeType("video/mp4")
+        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "ARTEX_video_completo.mp4")
         .setAllowedOverMetered(true)
         .setAllowedOverRoaming(false)
     (context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).enqueue(request)
