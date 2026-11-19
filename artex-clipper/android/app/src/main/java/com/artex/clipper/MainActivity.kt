@@ -64,6 +64,7 @@ fun ArtexStudio() {
     var selected by remember { mutableStateOf<Uri?>(null) }
     var fileName by remember { mutableStateOf("") }
     var rights by remember { mutableStateOf(false) }
+    var geminiKey by remember { mutableStateOf("") }
     var seconds by remember { mutableFloatStateOf(60f) }
     var status by remember { mutableStateOf("Tu estudio está listo. Selecciona un video para comenzar.") }
     var busy by remember { mutableStateOf(false) }
@@ -141,7 +142,10 @@ fun ArtexStudio() {
                             }
                         }
                     }
-                    Text("02  /  Duración máxima de cada clip", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text("02  /  Inteligencia artificial gratuita", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    OutlinedTextField(value = geminiKey, onValueChange = { geminiKey = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, label = { Text("Clave Gemini de Google AI Studio (opcional)") }, placeholder = { Text("Pega tu API key gratuita") }, visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = cyan, unfocusedBorderColor = Color(0xFF40516A), focusedLabelColor = cyan, unfocusedLabelColor = muted))
+                    Text("Sin clave: crea clips automáticamente por duración. Con clave gratuita: ARTEX analiza fotogramas y elige momentos con gancho, emoción y potencial para redes. La clave solo se usa durante este envío.", color = muted, fontSize = 11.sp, lineHeight = 16.sp)
+                    Text("03  /  Duración máxima de cada clip", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Slider(value = seconds, onValueChange = { seconds = it }, valueRange = 15f..240f, modifier = Modifier.weight(1f))
                         Spacer(Modifier.width(10.dp))
@@ -169,7 +173,7 @@ fun ArtexStudio() {
                                             .addFormDataPart("max_clip_seconds", seconds.toInt().toString())
                                             .addFormDataPart("file", fileName.ifBlank { "video.mp4" }, fileBytes.toRequestBody(mime.toMediaTypeOrNull()))
                                             .build()
-                                        val req = Request.Builder().url("$API_BASE/api/jobs").header("X-Content-Rights", "confirmed").post(body).build()
+                                        val req = Request.Builder().url("$API_BASE/api/jobs").header("X-Content-Rights", "confirmed").apply { if (geminiKey.isNotBlank()) header("X-Gemini-Api-Key", geminiKey.trim()) }.post(body).build()
                                         var state = http.newCall(req).execute().use { r ->
                                             if (!r.isSuccessful) error(r.body?.string() ?: "No se pudo subir el video.")
                                             JSONObject(r.body!!.string())
@@ -259,7 +263,7 @@ fun ArtexStudio() {
                     }
                 }) { Text(if (checking) "…" else "Probar", color = cyan, fontSize = 11.sp) }
             }
-            Text("ARTEX CLIPPER AI · Usa contenido propio o autorizado. El motor actual detecta escenas; la selección semántica de momentos virales y los subtítulos IA se incorporarán en una fase posterior.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
+            Text("ARTEX CLIPPER AI · Gemini analiza visualmente los fotogramas cuando añades una clave gratuita. Sin clave funciona el motor local básico. Revisa siempre los resultados antes de publicar.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
             Spacer(Modifier.height(12.dp))
         }
     }
