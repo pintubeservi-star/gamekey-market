@@ -270,7 +270,7 @@ fun ArtexStudio() {
                     }
                 }) { Text(if (checking) "…" else "Probar", color = cyan, fontSize = 11.sp) }
             }
-            Text("ARTEX CLIPPER AI · Gemini analiza imagen y audio cuando añades una clave gratuita. Sin clave funciona el motor local básico. Revisa siempre los resultados antes de publicar.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
+            Text("ARTEX CLIPPER AI · Gemini analiza fotogramas y selecciona momentos visualmente interesantes cuando añades una clave gratuita. Sin clave funciona el motor local básico. Revisa siempre los resultados antes de publicar.", color = Color(0xFF718096), fontSize = 10.sp, lineHeight = 15.sp)
             Spacer(Modifier.height(12.dp))
         }
     }
