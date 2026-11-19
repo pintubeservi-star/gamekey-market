@@ -63,15 +63,52 @@ def gemini_segments(source, temp_dir, duration, max_seconds, api_key):
         if exc.code == 429:
             raise RuntimeError("Se alcanzó el límite gratuito temporal de Gemini. Espera y vuelve a intentar.")
         raise RuntimeError(f"Error de Gemini ({exc.code}): {detail}")
-    text = "".join(part.get("text","") for part in data.get("candidates",[{}])[0].get("content",{}).get("parts",[]))
+    # La API puede devolver variantes de estructura; normalizamos antes de leer partes.
+    candidates = data.get("candidates") or []
+    if isinstance(candidates, dict):
+        candidates = [candidates]
+    if not isinstance(candidates, list) or not candidates:
+        feedback = data.get("promptFeedback") or {}
+        raise RuntimeError("Gemini no devolvió candidatos utilizables: " + json.dumps(feedback, ensure_ascii=False)[:700])
+    candidate = candidates[0]
+    if not isinstance(candidate, dict):
+        raise RuntimeError("Gemini devolvió un candidato con formato inesperado.")
+    content = candidate.get("content") or {}
+    if isinstance(content, list):
+        parts = content
+    elif isinstance(content, dict):
+        parts = content.get("parts") or []
+    else:
+        parts = []
+    if isinstance(parts, dict):
+        parts = [parts]
+    if not isinstance(parts, list):
+        raise RuntimeError("Gemini devolvió las partes en un formato inesperado.")
+    text = "".join(
+        part.get("text", "") for part in parts
+        if isinstance(part, dict) and isinstance(part.get("text", ""), str)
+    )
+    if not text.strip():
+        finish = candidate.get("finishReason", "desconocido")
+        raise RuntimeError(f"Gemini no devolvió texto JSON (finishReason={finish}).")
     try:
         parsed = json.loads(text)
     except Exception:
         match = re.search(r"\{[\s\S]*\}", text)
-        if not match: raise RuntimeError("La IA respondió en un formato que no se pudo interpretar.")
+        if not match:
+            raise RuntimeError("La IA respondió en un formato que no se pudo interpretar: " + text[:300])
         parsed = json.loads(match.group(0))
+    if isinstance(parsed, list):
+        parsed = {"clips": parsed}
+    if not isinstance(parsed, dict):
+        raise RuntimeError("El JSON de Gemini no contiene un objeto de resultados.")
+    clips_data = parsed.get("clips", [])
+    if isinstance(clips_data, dict):
+        clips_data = [clips_data]
+    if not isinstance(clips_data, list):
+        raise RuntimeError("Gemini devolvió 'clips' en un formato inesperado.")
     clips = []
-    for item in parsed.get("clips", []):
+    for item in clips_data:
         try:
             start = max(0.0, min(duration - 3.0, float(item["start"])))
             end = min(duration, max(start + 3.0, float(item["end"])))
