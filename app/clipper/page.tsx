@@ -61,6 +61,12 @@ export default function ClipperPage() {
             <input type="file" accept="video/*" className="hidden" onChange={e => setFile(e.target.files?.[0] || null)}/>
           </label>
           <div className="mt-7">
+            <label className="mb-2 block text-sm font-semibold">Cerebro IA gratuito · Gemini</label>
+            <input type="password" autoComplete="off" value={geminiKey} onChange={e => setGeminiKey(e.target.value)} placeholder="Pega tu clave gratuita de Google AI Studio (opcional)" className="w-full rounded-xl border border-cyan-400/30 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300"/>
+            <a className="mt-2 inline-block text-xs text-cyan-300 underline" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">Obtener clave gratuita de Gemini</a>
+            <p className="mt-2 text-xs text-slate-500">La clave se utiliza solo durante este procesamiento y no se guarda.</p>
+          </div>
+          <div className="mt-7">
             <div className="mb-3 flex justify-between"><label className="text-sm font-semibold">Duración máxima por clip</label><b className="text-cyan-300">{duration}s</b></div>
             <input aria-label="Duración máxima" type="range" min="15" max="240" step="15" value={duration} onChange={e => setDuration(Number(e.target.value))} className="w-full accent-cyan-400"/>
             <div className="flex justify-between text-xs text-slate-500"><span>15 segundos</span><span>4 minutos</span></div>
