@@ -9,6 +9,7 @@ export default function ClipperPage() {
   const [file, setFile] = useState<File | null>(null);
   const [duration, setDuration] = useState(60);
   const [rights, setRights] = useState(false);
+  const [geminiKey, setGeminiKey] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [job, setJob] = useState<any>(null);
@@ -20,7 +21,7 @@ export default function ClipperPage() {
     setBusy(true); setError(""); setStatus("Subiendo video…"); setJob(null);
     try {
       const data = new FormData(); data.append("file", file); data.append("max_clip_seconds", String(duration));
-      const res = await fetch(API + "/api/jobs", { method: "POST", headers: { "X-Content-Rights": "confirmed" }, body: data });
+      const res = await fetch(API + "/api/jobs", { method: "POST", headers: { "X-Content-Rights": "confirmed", ...(geminiKey.trim() ? { "X-Gemini-Api-Key": geminiKey.trim() } : {}) }, body: data });
       if (!res.ok) throw new Error((await res.text()) || "No se pudo enviar el video");
       const created = await res.json(); setJob(created);
       let current = created;
@@ -73,14 +74,14 @@ export default function ClipperPage() {
         <aside className="space-y-4">
           <div className="rounded-3xl border border-white/10 bg-[#11151e] p-6">
             <Sparkles className="mb-4 text-cyan-300"/><h3 className="text-lg font-bold">Qué prepara</h3>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">{["Detección de cambios de escena","Fragmentos verticales 9:16","Exportación MP4 para redes","Revisión antes de publicar"].map(x=><li key={x} className="flex gap-2"><ShieldCheck size={17} className="shrink-0 text-cyan-300"/>{x}</li>)}</ul>
+            <ul className="mt-4 space-y-3 text-sm text-slate-300">{["Análisis visual Gemini cuando configures la clave","Selección de ganchos y momentos destacados","Fragmentos verticales 9:16 con audio","Descarga MP4 y revisión antes de publicar"].map(x=><li key={x} className="flex gap-2"><ShieldCheck size={17} className="shrink-0 text-cyan-300"/>{x}</li>)}</ul>
           </div>
           <div className="rounded-3xl border border-white/10 bg-[#11151e] p-6">
             <Activity className="mb-4 text-cyan-300"/><h3 className="text-lg font-bold">Estado del proyecto</h3>
             <p className="mt-2 text-sm text-slate-400">{job ? "ID: " + job.id : "Todavía no has iniciado un procesamiento."}</p>
             {job?.clips?.map((clip: any, i: number) => <div key={clip.id || i} className="mt-4 rounded-xl bg-black/30 p-3"><div className="flex items-center justify-between text-sm font-semibold"><span>Clip {i+1}</span><span className="text-cyan-300">{Math.round(clip.duration)}s</span></div><p className="mt-1 text-xs text-slate-500">{clip.start.toFixed(1)}s – {clip.end.toFixed(1)}s</p><a className="mt-3 inline-flex items-center gap-2 text-sm text-cyan-300 underline" href={API + clip.url} target="_blank" rel="noreferrer"><Download size={15}/> Descargar MP4</a></div>)}
           </div>
-          <p className="px-2 text-xs leading-5 text-slate-500"><Clock3 className="mr-1 inline" size={13}/> El análisis de esta primera versión detecta cambios de escena; no garantiza viralidad ni sustituye la revisión editorial.</p>
+          <p className="px-2 text-xs leading-5 text-slate-500"><Clock3 className="mr-1 inline" size={13}/> Con Gemini configurado, la IA evalúa los fotogramas para proponer momentos destacados. No garantiza viralidad; revisa cada clip antes de publicarlo.</p>
         </aside>
       </div>
     </section>
