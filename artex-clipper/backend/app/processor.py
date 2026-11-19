@@ -101,19 +101,25 @@ def make_clips(source, out_dir, job_id, max_seconds, api_key=None):
     temp_dir = out_dir / f"analysis_{job_id}"
     temp_dir.mkdir(parents=True, exist_ok=True)
     engine = "gemini" if api_key else "local"
+    ai_warning = None
     try:
-        if api_key:
-            segments = gemini_segments(source, temp_dir, duration, max_seconds, api_key)
-            if not segments:
-                raise RuntimeError("La IA no encontró fragmentos válidos. Prueba con otro video.")
-        else:
-            segments = fallback_segments(duration, max_seconds)
-        # Exporta el video entero, desde el primer segundo hasta el final, además de los clips.
+        # Primero asegura una exportación íntegra: un fallo de IA nunca debe borrar el video final.
         full_name = f"{job_id}_video_completo.mp4"
         full_dest = out_dir / full_name
         run(["ffmpeg","-y","-i",source,"-map","0:v:0","-map","0:a?","-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1","-c:v","libx264","-preset","veryfast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",str(full_dest)])
         if not full_dest.exists() or full_dest.stat().st_size < 1024:
             raise RuntimeError("No se pudo exportar el video completo.")
+        if api_key:
+            try:
+                segments = gemini_segments(source, temp_dir, duration, max_seconds, api_key)
+                if not segments:
+                    raise RuntimeError("La IA no encontró fragmentos destacados.")
+            except Exception as exc:
+                engine = "local_fallback"
+                ai_warning = str(exc)[:500]
+                segments = fallback_segments(duration, max_seconds)
+        else:
+            segments = fallback_segments(duration, max_seconds)
         results = []
         for idx, segment in enumerate(segments):
             name = f"{job_id}_{idx+1}.mp4"
