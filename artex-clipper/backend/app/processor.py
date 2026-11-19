@@ -34,7 +34,7 @@ def gemini_segments(source, temp_dir, duration, max_seconds, api_key):
         "Eres ARTEX, un editor experto de videos cortos para TikTok, Reels y Shorts. "
         "Analiza los fotogramas del video en el orden recibido. Cada imagen viene precedida "
         "por su tiempo exacto en segundos. Encuentra hasta 8 fragmentos consecutivos que tengan "
-        "un gancho visual, acción, emoción, sorpresa, humor, transformación, explicación útil "
+        "un gancho visual, acción, emoción, sorpresa, humor, transformación, explicación útil, diálogo memorable, una frase contundente o una historia entendible por su audio. "
         "o una historia que se entienda. No inventes diálogo ni eventos fuera de los fotogramas. "
         "Prioriza inicios que atrapen y finales que dejen una idea completa. "
         f"Duración total: {duration:.2f}s. Duración máxima por clip: {max_seconds}s. "
@@ -48,6 +48,12 @@ def gemini_segments(source, temp_dir, duration, max_seconds, api_key):
     for timestamp, path in frames:
         parts.append({"text": f"Fotograma en {timestamp:.2f} segundos:"})
         parts.append({"inline_data":{"mime_type":"image/jpeg","data":base64.b64encode(path.read_bytes()).decode("ascii")}})
+    # Añade la pista de audio comprimida para que Gemini pueda valorar diálogo y voz, no solo imágenes.
+    audio_path = temp_dir / "audio.mp3"
+    audio_result = subprocess.run(["ffmpeg","-y","-i",source,"-vn","-ac","1","-ar","16000","-b:a","48k",str(audio_path)],capture_output=True,text=True,timeout=7200)
+    if audio_result.returncode == 0 and audio_path.exists() and audio_path.stat().st_size <= 18 * 1024 * 1024:
+        parts.append({"text":"Audio completo del video. Analiza frases, emoción, claridad, remates y momentos importantes con sus tiempos aproximados:"})
+        parts.append({"inline_data":{"mime_type":"audio/mpeg","data":base64.b64encode(audio_path.read_bytes()).decode("ascii")}})
     payload = json.dumps({"contents":[{"role":"user","parts":parts}],"generationConfig":{"temperature":0.2,"responseMimeType":"application/json"}}).encode()
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={api_key}"
     req = urllib.request.Request(url, data=payload, headers={"Content-Type":"application/json"}, method="POST")
@@ -71,8 +77,8 @@ def gemini_segments(source, temp_dir, duration, max_seconds, api_key):
     clips = []
     for item in parsed.get("clips", []):
         try:
-            start = max(0.0, min(duration - 1, float(item["start"])))
-            end = max(start + 3.0, min(duration, float(item["end"])))
+            start = max(0.0, min(duration - 3.0, float(item["start"])))
+            end = min(duration, max(start + 3.0, float(item["end"])))
             end = min(end, start + max_seconds)
             if end - start < 3: continue
             clips.append({"start":start,"end":end,"score":max(0,min(100,int(item.get("score",70)))),"hook":str(item.get("hook","Momento destacado"))[:180],"reason":str(item.get("reason","Seleccionado por análisis visual"))[:260],"caption":str(item.get("caption",""))[:220]})
