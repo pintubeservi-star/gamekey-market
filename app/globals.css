@@ -55,30 +55,3 @@
 @media(max-width:760px){.store-reviews{margin:0 6% 65px}.store-reviews-panel{grid-template-columns:1fr;padding:22px;gap:15px}.store-reviews-count{justify-content:flex-start;border-right:0;border-bottom:1px solid #ffffff20;padding:0 0 15px}.store-reviews-count>b{font-size:53px}}
 
 
-/* Reviews / community information refresh */
-.store-reviews{max-width:1080px;margin:0 auto 95px;padding:0 0 10px}
-.store-reviews-heading{text-align:center;margin:0 auto 28px;max-width:650px}
-.store-reviews-heading h2{font:900 clamp(38px,5vw,56px)/.95 'Barlow Condensed';margin:13px 0}
-.store-reviews-heading h2 em{font-style:normal;background:linear-gradient(90deg,#ff4d9a,#ffb36e 60%,#55e6df);background-clip:text;-webkit-background-clip:text;color:transparent}
-.store-reviews-heading>p{font-size:11px;line-height:1.8;color:#aaa2af}
-.store-reviews-panel{display:grid;grid-template-columns:190px 1fr;gap:25px;align-items:start;padding:30px;background:linear-gradient(135deg,#17151f,#101017);border:1px solid #ffffff1c;border-radius:5px}
-.store-reviews-count{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-right:1px solid #ffffff20;padding:18px;min-height:220px}
-.store-reviews-count>b{font:900 76px/.9 'Barlow Condensed';color:#fff}
-.store-reviews-count>span{font-size:8px;line-height:1.7;letter-spacing:1.5px;color:#55e6df;font-weight:900;text-align:center}
-.store-reviews-count>small{font-size:8px;line-height:1.6;color:#8f8795;text-align:center}
-.store-reviews-empty{display:flex;flex-direction:column;align-items:stretch;min-width:0}
-.store-reviews-live{display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:1.2px;font-weight:900;color:#55e6df;margin-bottom:15px}
-.store-live-dot{width:7px;height:7px;border-radius:50%;background:#55e6df;box-shadow:0 0 12px #55e6df88}
-.store-preview-label{margin-left:auto;color:#a69daa;border:1px solid #ffffff25;padding:5px 7px;font-size:7px}
-.store-reviews-empty>b{font-size:14px;color:#fff}
-.store-question-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
-.store-question-grid article{padding:14px;background:#ffffff06;border:1px solid #ffffff12;border-radius:3px}
-.store-question-grid article>span{font-size:7px;letter-spacing:1px;color:#ff9bc2;font-weight:900}
-.store-question-grid article>p{font-size:11px;font-weight:800;margin:8px 0 5px;color:#f6f1f6}
-.store-question-grid article>small{display:block;font-size:9px;line-height:1.7;color:#aaa2af}
-.store-review-locked{display:flex;align-items:center;gap:12px;padding:14px;margin-top:14px;background:#55e6df0a;border:1px solid #55e6df33}
-.store-review-locked>svg{color:#55e6df;flex-shrink:0}
-.store-review-locked b,.store-review-locked small{display:block}
-.store-review-locked b{font-size:8px;letter-spacing:1px;color:#55e6df}
-.store-review-locked small{font-size:8px;line-height:1.6;color:#aaa2af;margin-top:5px}
-@media(max-width:760px){.store-reviews{margin:0 6% 65px}.store-reviews-panel{grid-template-columns:1fr;padding:20px;gap:12px}.store-reviews-count{flex-direction:row;justify-content:flex-start;min-height:0;border-right:0;border-bottom:1px solid #ffffff20;padding:0 0 15px}.store-reviews-count>b{font-size:54px}.store-reviews-count>span{text-align:left}.store-reviews-count>small{text-align:left;margin-left:auto}.store-question-grid{grid-template-columns:1fr}.store-reviews-live{flex-wrap:wrap}}
