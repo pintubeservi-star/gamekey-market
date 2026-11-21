@@ -11,6 +11,10 @@ export default function Home(){
  const [menuOpen,setMenuOpen]=useState(false);
  const scrollTo=(id:string)=>{document.getElementById(id)?.scrollIntoView({behavior:"smooth"});setMenuOpen(false)};
  return <main className="gta-page">
+  <section className="gta-video-intro" aria-label="Intro cinematográfica de GTA">
+   <iframe src="https://drive.google.com/file/d/1v1NT5-i9abHRno_uNASCGWX8Cwt9HBdX/preview?autoplay=1" title="Intro de GTA" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen/>
+   <div className="gta-video-caption"><span>GAMEKEY MARKET PRESENTS</span><b>VICE CITY IS CALLING</b><a href="#top">ENTRAR AL SITIO <ArrowDown size={14}/></a></div>
+  </section>
   <div className="gta-topline"><span>GAMEKEY MARKET ORIGINALS</span><span>LEONIDA · USA　/　2026</span></div>
   <header className="gta-header">
    <a className="gta-logo" href="#top"><span className="gta-logo-icon"><Gamepad2 size={22}/></span><span>GAMEKEY <b>MARKET</b><small>THE DIGITAL GAME DISTRICT</small></span></a>
