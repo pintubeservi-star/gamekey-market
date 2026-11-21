@@ -1,0 +1,9 @@
+import type { MetadataRoute } from "next";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: { userAgent: "*", allow: "/" },
+    sitemap: "https://gta6mobile.shop/sitemap.xml",
+    host: "https://gta6mobile.shop",
+  };
+}
