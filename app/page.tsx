@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { track } from "@vercel/analytics";
 import { ArrowDown, ArrowRight, CheckCircle2, Download, Gamepad2, ShieldCheck, Smartphone, Zap } from "lucide-react";
 
 declare global {
@@ -36,7 +37,46 @@ export default function Home() {
     return () => { script.onload = null; };
   }, []);
 
-  const goToPay = () => document.getElementById("comprar")?.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => {
+    const targets = ["detalles", "requisitos", "comprar"];
+    const seen = new Set<string>();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const id = (entry.target as HTMLElement).id;
+        if (entry.isIntersecting && id && !seen.has(id)) {
+          seen.add(id);
+          track("section_view", { section: id });
+        }
+      });
+    }, { threshold: 0.35 });
+    targets.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+    const scrollMarks = [25, 50, 75, 90];
+    const fired = new Set<number>();
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (max <= 0) return;
+      const depth = Math.round((window.scrollY / max) * 100);
+      scrollMarks.forEach((mark) => {
+        if (depth >= mark && !fired.has(mark)) {
+          fired.add(mark);
+          track("scroll_depth", { percent: mark });
+        }
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  const goToPay = (placement: string) => {
+    track("checkout_cta_click", { placement });
+    document.getElementById("comprar")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <main className="store-page">
@@ -44,7 +84,7 @@ export default function Home() {
       <header className="store-header">
         <a className="store-brand" href="#inicio"><span className="store-brand-icon"><Gamepad2 size={23}/></span><span>GTA 6 <b>MÓVILES</b><small>EXPERIENCIA DIGITAL ANDROID</small></span></a>
         <nav><a href="#detalles">DETALLES</a><a href="#requisitos">REQUISITOS</a><a href="#comprar">COMPRAR</a></nav>
-        <button className="store-nav-cta" onClick={goToPay}>OBTENER ACCESO <ArrowRight size={15}/></button>
+        <button className="store-nav-cta" onClick={() => goToPay("header")}>OBTENER ACCESO <ArrowRight size={15}/></button>
       </header>
 
       <section className="store-hero" id="inicio">
@@ -56,7 +96,7 @@ export default function Home() {
           <h1>GRAND THEFT<br/><em>AUTO VI</em></h1>
           <p className="store-lead">LEONIDA EN LA PALMA DE TU MANO.</p>
           <p className="store-description">Descubre la propuesta digital para Android de GTA 6 Móviles. Consulta los detalles de esta edición y consigue acceso mediante un pago seguro procesado por PayPal.</p>
-          <div className="store-hero-actions"><button onClick={goToPay} className="store-primary">COMPRAR POR US$5 <ArrowRight size={17}/></button><a href="#detalles" className="store-secondary">VER DETALLES <ArrowDown size={15}/></a></div>
+          <div className="store-hero-actions"><button onClick={() => goToPay("hero")} className="store-primary">COMPRAR POR US$5 <ArrowRight size={17}/></button><a href="#detalles" className="store-secondary">VER DETALLES <ArrowDown size={15}/></a></div>
           <div className="store-hero-foot"><span><ShieldCheck size={15}/> PAGO PROCESADO POR PAYPAL</span><span><Smartphone size={15}/> PARA ANDROID</span></div>
         </div>
         <div className="store-hero-caption">VICE CITY / LEONIDA</div>
