@@ -12,7 +12,8 @@ export default function Home() {
     const container = document.getElementById("paypal-container-G9SNDRRG5PDZN");
     if (!container) return;
     const renderButton = () => {
-      if (window.paypal && container.childElementCount === 0) {
+      if (window.paypal && !container.dataset.paypalRendered) {
+        container.dataset.paypalRendered = "true";
         window.paypal.HostedButtons({ hostedButtonId: "G9SNDRRG5PDZN" }).render("#paypal-container-G9SNDRRG5PDZN");
       }
     };
@@ -30,6 +31,7 @@ export default function Home() {
     script.src = "https://www.paypal.com/sdk/js?client-id=BAAlFzwu03LxQ-hFxYtajTJnIUxXD5ineu4oqSAfpgMjYrhXl8fn5HtOspodzQrK4CFlm3lICc1S_78bFM&components=hosted-buttons&disable-funding=venmo&currency=USD";
     script.async = true;
     script.onload = renderButton;
+    script.onerror = () => { container.textContent = "PayPal no está disponible en este momento. Recarga la página para intentarlo de nuevo."; };
     document.body.appendChild(script);
     return () => { script.onload = null; };
   }, []);
@@ -73,7 +75,7 @@ export default function Home() {
 
       <section className="store-buy" id="comprar">
         <div className="store-buy-copy"><span className="store-kicker">03 / ACCESO DIGITAL</span><h2>HAZLO TUYO<br/><em>POR US$5.</em></h2><p>Precio especial de lanzamiento para esta oferta digital.</p><div className="store-price"><span>US$</span><b>5</b><small>USD · PAGO ÚNICO</small></div><ul><li><CheckCircle2/> Pago procesado por PayPal</li><li><CheckCircle2/> Compra digital</li><li><CheckCircle2/> Revisa los requisitos antes de pagar</li></ul></div>
-        <div className="store-checkout"><div className="store-checkout-head"><ShieldCheck/><div><b>CHECKOUT SEGURO</b><small>Completa tu pago con PayPal</small></div></div><div id="paypal-container-G9SNDRRG5PDZN" className="paypal-hosted"><div className="paypal-loading">Cargando opciones de pago de PayPal…</div></div><p className="store-paypal-note">El importe definitivo lo determina la configuración del botón alojado en PayPal. Confirma que ese botón esté configurado en US$5 antes de aceptar pagos.</p></div>
+        <div className="store-checkout"><div className="store-checkout-head"><ShieldCheck/><div><b>CHECKOUT SEGURO</b><small>Completa tu pago con PayPal</small></div></div><div id="paypal-container-G9SNDRRG5PDZN" className="paypal-hosted" aria-label="Botón de pago PayPal"></div><p className="store-paypal-note">El importe definitivo lo determina la configuración del botón alojado en PayPal. Confirma que ese botón esté configurado en US$5 antes de aceptar pagos.</p></div>
       </section>
 
       <section className="store-delivery"><Zap/><div><b>IMPORTANTE SOBRE LA ENTREGA</b><p>El botón de PayPal procesa el pago, pero esta página todavía no valida automáticamente la transacción ni libera una descarga protegida. No se mostrará un enlace de descarga hasta configurar la confirmación del pago y la entrega segura del archivo.</p></div></section>
