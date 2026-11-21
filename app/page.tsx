@@ -80,6 +80,23 @@ export default function Home() {
 
       <section className="store-delivery"><Zap/><div><b>IMPORTANTE SOBRE LA ENTREGA</b><p>El botón de PayPal procesa el pago, pero esta página todavía no valida automáticamente la transacción ni libera una descarga protegida. No se mostrará un enlace de descarga hasta configurar la confirmación del pago y la entrega segura del archivo.</p></div></section>
 
+      <section className="store-reviews" id="opiniones">
+        <div className="store-reviews-heading">
+          <span className="store-kicker">04 / OPINIONES DE CLIENTES</span>
+          <h2>EXPERIENCIAS <em>REALES.</em></h2>
+          <p>Las opiniones se mostrarán aquí únicamente después de verificar que la persona completó una compra.</p>
+        </div>
+        <div className="store-reviews-panel">
+          <div className="store-reviews-count"><b>0</b><span>OPINIONES<br/>VERIFICADAS</span></div>
+          <div className="store-reviews-empty">
+            <ShieldCheck/>
+            <b>Solo compradores verificados pueden comentar</b>
+            <p>Cuando la confirmación segura de PayPal esté conectada, cada comprador recibirá acceso para publicar una opinión. No mostramos comentarios inventados ni reseñas sin verificar.</p>
+            <span className="store-review-status">PUBLICACIÓN DE OPINIONES: PENDIENTE DE VERIFICACIÓN DE COMPRA</span>
+          </div>
+        </div>
+      </section>
+
       <footer className="store-footer"><a className="store-brand" href="#inicio"><span className="store-brand-icon"><Gamepad2 size={20}/></span><span>GTA 6 <b>MÓVILES</b><small>EDICIÓN DIGITAL INDEPENDIENTE</small></span></a><p>Distribución independiente. No afiliada, patrocinada ni aprobada por Rockstar Games o Take-Two Interactive.</p><small>Grand Theft Auto, GTA y los elementos relacionados son marcas de sus respectivos propietarios. Las imágenes promocionales pertenecen a sus titulares y se muestran con fines de identificación editorial.</small></footer>
     </main>
   );
