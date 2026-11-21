@@ -78,10 +78,7 @@ export default function Home() {
         <div className="store-checkout"><div className="store-checkout-head"><ShieldCheck/><div><b>CHECKOUT SEGURO</b><small>Completa tu pago con PayPal</small></div></div><div id="paypal-container-G9SNDRRG5PDZN" className="paypal-hosted" aria-label="Botón de pago PayPal"></div><p className="store-paypal-note">El importe definitivo lo determina la configuración del botón alojado en PayPal. Confirma que ese botón esté configurado en US$5 antes de aceptar pagos.</p></div>
       </section>
 
-      <section className="store-delivery"><Zap/><div><b>IMPORTANTE SOBRE LA ENTREGA</b><p>El botón de PayPal procesa el pago, pero esta página todavía no valida automáticamente la transacción ni libera una descarga protegida. No se mostrará un enlace de descarga hasta configurar la confirmación del pago y la entrega segura del archivo.</p></div></section>
-
-
-      <footer className="store-footer"><a className="store-brand" href="#inicio"><span className="store-brand-icon"><Gamepad2 size={20}/></span><span>GTA 6 <b>MÓVILES</b><small>EDICIÓN DIGITAL INDEPENDIENTE</small></span></a><p>Distribución independiente. No afiliada, patrocinada ni aprobada por Rockstar Games o Take-Two Interactive.</p><small>Grand Theft Auto, GTA y los elementos relacionados son marcas de sus respectivos propietarios. Las imágenes promocionales pertenecen a sus titulares y se muestran con fines de identificación editorial.</small></footer>
+<footer className="store-footer"><a className="store-brand" href="#inicio"><span className="store-brand-icon"><Gamepad2 size={20}/></span><span>GTA 6 <b>MÓVILES</b><small>EDICIÓN DIGITAL INDEPENDIENTE</small></span></a><p>Distribución independiente. No afiliada, patrocinada ni aprobada por Rockstar Games o Take-Two Interactive.</p><small>Grand Theft Auto, GTA y los elementos relacionados son marcas de sus respectivos propietarios. Las imágenes promocionales pertenecen a sus titulares y se muestran con fines de identificación editorial.</small></footer>
     </main>
   );
 }
