@@ -82,17 +82,22 @@ export default function Home() {
 
       <section className="store-reviews" id="opiniones">
         <div className="store-reviews-heading">
-          <span className="store-kicker">04 / OPINIONES DE CLIENTES</span>
-          <h2>EXPERIENCIAS <em>REALES.</em></h2>
-          <p>Las opiniones se mostrarán aquí únicamente después de verificar que la persona completó una compra.</p>
+          <span className="store-kicker">04 / COMUNIDAD Y OPINIONES</span>
+          <h2>ANTES DE COMPRAR, <em>INFÓRMATE.</em></h2>
+          <p>Respuestas claras a las dudas habituales. Las reseñas de clientes se publicarán solo cuando la compra esté confirmada.</p>
         </div>
         <div className="store-reviews-panel">
-          <div className="store-reviews-count"><b>0</b><span>OPINIONES<br/>VERIFICADAS</span></div>
+          <div className="store-reviews-count"><b>0</b><span>OPINIONES<br/>VERIFICADAS</span><small>Reseñas auténticas<br/>de compradores</small></div>
           <div className="store-reviews-empty">
-            <ShieldCheck/>
-            <b>Solo compradores verificados pueden comentar</b>
-            <p>Cuando la confirmación segura de PayPal esté conectada, cada comprador recibirá acceso para publicar una opinión. No mostramos comentarios inventados ni reseñas sin verificar.</p>
-            <span className="store-review-status">PUBLICACIÓN DE OPINIONES: PENDIENTE DE VERIFICACIÓN DE COMPRA</span>
+            <div className="store-reviews-live"><span className="store-live-dot"></span> CENTRO DE INFORMACIÓN <span className="store-preview-label">CONTENIDO INFORMATIVO</span></div>
+            <b>Lo que debes saber antes de adquirir esta edición</b>
+            <div className="store-question-grid">
+              <article><span>01 · COMPATIBILIDAD</span><p>¿Funciona en cualquier Android?</p><small>No necesariamente. Comprueba el modelo y la versión de Android admitidos en la ficha técnica antes de pagar.</small></article>
+              <article><span>02 · DESCARGA</span><p>¿Cuánto espacio necesito?</p><small>Revisa el tamaño del archivo y reserva espacio adicional para la instalación y los datos temporales.</small></article>
+              <article><span>03 · ENTREGA</span><p>¿Cómo recibo el acceso?</p><small>La entrega digital requiere confirmación del pago. La validación automática todavía debe activarse.</small></article>
+              <article><span>04 · RESEÑAS</span><p>¿Quién puede dejar una opinión?</p><small>Únicamente compradores con una transacción verificada podrán publicar una reseña en esta sección.</small></article>
+            </div>
+            <div className="store-review-locked"><ShieldCheck/><div><b>COMENTARIOS RESERVADOS A COMPRADORES</b><small>La publicación se habilitará al conectar la verificación segura de PayPal. No se muestran testimonios ficticios.</small></div></div>
           </div>
         </div>
       </section>
