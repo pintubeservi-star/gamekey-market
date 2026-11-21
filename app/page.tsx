@@ -1,60 +1,84 @@
 "use client";
-import { ArrowDown, ArrowRight, Download, Gamepad2, Menu, ShieldAlert, Smartphone, X, MapPin, CalendarDays, Users, ExternalLink } from "lucide-react";
-import { useState } from "react";
 
-const shots = [
- {src:"https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_14.10e7v.06pcm_t.jpg?akim=1&imdensity=1&imwidth=1600",alt:"Jason y Lucia en GTA VI",label:"JASON Y LUCIA"},
- {src:"https://www.rockstargames.com/VI/_next/static/media/Vice_City_13.0iq8ff474tsdx.jpg?akim=1&imdensity=1&imwidth=1600",alt:"Vice City en Grand Theft Auto VI",label:"VICE CITY"},
- {src:"https://www.rockstargames.com/VI/_next/static/media/Leonida_Keys_07.0z9tb69ssp4rq.jpg?akim=1&imdensity=1&imwidth=1600",alt:"Leonida Keys en GTA 6",label:"LEONIDA KEYS"}
-];
-const faqs = [
- ["¿Cuándo salió GTA 6?", "Rockstar Games anunció que Grand Theft Auto VI se lanzó el 19 de noviembre de 2026 para PlayStation 5 y Xbox Series X|S."],
- ["¿GTA 6 está disponible para Android?", "No existe una versión nativa oficial de GTA VI para Android anunciada por Rockstar Games. Desconfía de páginas que presenten archivos APK como oficiales."],
- ["¿GTA 6 está disponible para PC?", "A fecha de la información oficial consultada para esta página, Rockstar ha confirmado PlayStation 5 y Xbox Series X|S. No se debe dar por confirmada una versión de PC hasta que Rockstar la anuncie."],
- ["¿Dónde ocurre la historia de GTA VI?", "La historia transcurre en el estado ficticio de Leonida y regresa a Vice City, una ciudad inspirada en Miami."],
- ["¿Quiénes son los protagonistas?", "Los protagonistas principales son Jason Duval y Lucia Caminos, una pareja que queda envuelta en una conspiración criminal."],
- ["¿Qué es el archivo Android de esta página?", "El enlace de descarga se publicará cuando el administrador añada el archivo y compruebe qué contiene. No es una descarga oficial de Rockstar ni debe confundirse con el juego original de consola."]
-];
-export default function Home(){
- const [menuOpen,setMenuOpen]=useState(false);
- const scrollTo=(id:string)=>{document.getElementById(id)?.scrollIntoView({behavior:"smooth"});setMenuOpen(false)};
- const jsonLd={"@context":"https://schema.org","@type":"WebSite","name":"GTA 6 MÓVILES","url":"https://gta6mobile.shop","description":"Guía independiente en español sobre Grand Theft Auto VI: historia, personajes, Leonida, Vice City, plataformas y novedades verificadas.","inLanguage":"es","publisher":{"@type":"Organization","name":"GTA 6 MÓVILES"}};
- const faqLd={"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs.map(([q,a])=>({"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}}))};
- return <main className="gta-page">
-  <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(jsonLd)}}/>
-  <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(faqLd)}}/>
-  <div className="gta-topline"><span>GTA 6 MÓVILES · GUÍA INDEPENDIENTE</span><span>GRAND THEFT AUTO VI　/　LEONIDA</span></div>
-  <header className="gta-header">
-   <a className="gta-logo" href="#top"><span className="gta-logo-icon"><Gamepad2 size={22}/></span><span>GTA 6 <b>MÓVILES</b><small>NOTICIAS · GUÍAS · INFORMACIÓN</small></span></a>
-   <nav className={menuOpen?"gta-nav open":"gta-nav"}><button onClick={()=>scrollTo("juego")}>EL JUEGO</button><button onClick={()=>scrollTo("personajes")}>PERSONAJES</button><button onClick={()=>scrollTo("mapa")}>LEONIDA</button><button onClick={()=>scrollTo("android")}>ANDROID</button><button onClick={()=>scrollTo("preguntas")}>PREGUNTAS</button></nav>
-   <button className="gta-menu" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Menú">{menuOpen?<X/>:<Menu/>}</button>
-   <button className="gta-header-cta" onClick={()=>scrollTo("juego")}>EXPLORAR GTA VI <ArrowRight size={15}/></button>
-  </header>
-  <section className="gta-hero" id="top"><div className="gta-hero-art"/><div className="gta-hero-shade"/>
-   <div className="gta-hero-copy"><div className="gta-overline"><span/> GUÍA INDEPENDIENTE · ACTUALIZADA NOVIEMBRE 2026</div><div className="gta-logo-title">VI</div>
-    <h1>GRAND THEFT<br/><em>AUTO VI</em></h1><p className="gta-hero-sub">BIENVENIDO AL ESTADO DE LEONIDA.</p>
-    <p className="gta-hero-text">Vice City vuelve a abrir sus puertas. Conoce a Jason y Lucia, descubre el mundo de Leonida y consulta información del juego basada en fuentes oficiales de Rockstar Games.</p>
-    <div className="gta-hero-actions"><button className="gta-main-btn" onClick={()=>scrollTo("juego")}>CONOCE EL JUEGO <ArrowDown size={17}/></button><a className="gta-ghost-btn" href="https://www.rockstargames.com/VI" target="_blank" rel="noreferrer">ROCKSTAR GAMES <ExternalLink size={15}/></a></div>
-    <div className="gta-platform-note"><span>LANZAMIENTO: 19 NOV 2026</span><span>PS5 · XBOX SERIES X|S</span></div>
-   </div><div className="gta-hero-index">VICE CITY <b>LEONIDA · USA</b></div><div className="gta-hero-bottom"><span>INFORMACIÓN DEL VIDEOJUEGO</span><span>DESLIZA PARA EXPLORAR ↓</span></div>
-  </section>
+import { useEffect } from "react";
+import { ArrowDown, ArrowRight, CheckCircle2, Download, Gamepad2, ShieldCheck, Smartphone, Zap } from "lucide-react";
 
-  <section className="gta-intro" id="juego"><div className="gta-intro-label">01 — INFORMACIÓN DEL JUEGO</div><div className="gta-intro-main"><p className="gta-kicker">GRAND THEFT AUTO VI</p><h2>UNA HISTORIA<br/>EN EL LADO <em>SOLEADO.</em></h2><p>Grand Theft Auto VI es una aventura de acción y mundo abierto desarrollada por Rockstar Games. La historia sigue a Jason Duval y Lucia Caminos mientras intentan salir adelante en Leonida y terminan atrapados en una peligrosa conspiración criminal. El escenario principal incluye una nueva versión de Vice City.</p><div className="gta-facts"><div><b>19.11.26</b><span>FECHA DE LANZAMIENTO</span></div><div><b>2</b><span>PROTAGONISTAS</span></div><div><b>R*</b><span>ROCKSTAR GAMES</span></div></div></div><div className="gta-intro-image"><img src={shots[0].src} alt="Jason Duval y Lucia Caminos, protagonistas de GTA VI"/><span>JASON DUVAL & LUCIA CAMINOS</span></div></section>
+declare global {
+  interface Window { paypal?: { HostedButtons: (args: { hostedButtonId: string }) => { render: (selector: string) => Promise<unknown> | unknown } } }
+}
 
-  <section className="gta-detail-section" id="personajes"><div className="gta-detail-heading"><span>02 — PERSONAJES PRINCIPALES</span><h2>CONOCE A <em>JASON Y LUCIA.</em></h2><p>Dos vidas marcadas por decisiones difíciles y un futuro que depende de cuánto estén dispuestos a arriesgar.</p></div><div className="gta-character-grid"><article className="gta-character"><img src="https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_14.10e7v.06pcm_t.jpg?akim=1&imdensity=1&imwidth=1600" alt="Jason Duval en GTA VI"/><div><span>01 / PROTAGONISTA</span><h3>JASON DUVAL</h3><p>Jason creció rodeado de estafadores y delincuentes. Tras pasar por el ejército, terminó trabajando para traficantes locales en los Cayos. Conoce el mundo criminal, pero su encuentro con Lucia puede cambiar el rumbo de su vida.</p></div></article><article className="gta-character"><img src="https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_14.10e7v.06pcm_t.jpg?akim=1&imdensity=1&imwidth=1600" alt="Lucia Caminos en GTA VI"/><div><span>02 / PROTAGONISTA</span><h3>LUCIA CAMINOS</h3><p>Lucia aprendió a defenderse desde pequeña. Una pelea por su familia la llevó a prisión en Leonida; ahora está libre y decidida a construir la vida que desea, aunque para conseguirla tenga que asumir grandes riesgos.</p></div></article></div></section>
+export default function Home() {
+  useEffect(() => {
+    const container = document.getElementById("paypal-container-G9SNDRRG5PDZN");
+    if (!container) return;
+    const renderButton = () => {
+      if (window.paypal && container.childElementCount === 0) {
+        window.paypal.HostedButtons({ hostedButtonId: "G9SNDRRG5PDZN" }).render("#paypal-container-G9SNDRRG5PDZN");
+      }
+    };
+    if (window.paypal) {
+      renderButton();
+      return;
+    }
+    const existing = document.querySelector<HTMLScriptElement>('script[data-gta-paypal="true"]');
+    if (existing) {
+      existing.addEventListener("load", renderButton);
+      return () => existing.removeEventListener("load", renderButton);
+    }
+    const script = document.createElement("script");
+    script.dataset.gtaPaypal = "true";
+    script.src = "https://www.paypal.com/sdk/js?client-id=BAAlFzwu03LxQ-hFxYtajTJnIUxXD5ineu4oqSAfpgMjYrhXl8fn5HtOspodzQrK4CFlm3lICc1S_78bFM&components=hosted-buttons&disable-funding=venmo&currency=USD";
+    script.async = true;
+    script.onload = renderButton;
+    document.body.appendChild(script);
+    return () => { script.onload = null; };
+  }, []);
 
-  <section className="gta-map-section" id="mapa"><div className="gta-map-image"><img src={shots[2].src} alt="Paisaje de Leonida Keys en GTA VI"/></div><div className="gta-map-copy"><span className="gta-kicker">03 — EL MUNDO DE GTA VI</span><h2>EL ESTADO DE <em>LEONIDA.</em></h2><p>Leonida es el estado ficticio donde se desarrolla Grand Theft Auto VI. Su ambiente combina zonas urbanas, costa, humedales, pequeñas comunidades y paisajes inspirados en Florida. En el centro de esta región está Vice City, una ciudad de luces intensas, vida nocturna y contrastes.</p><ul><li><b>Vice City:</b> el gran entorno urbano inspirado en Miami.</li><li><b>Leonida Keys:</b> una zona insular y costera del estado.</li><li><b>Grassrivers:</b> región de humedales y naturaleza.</li><li><b>Port Gellhorn:</b> localidad costera presentada por Rockstar.</li><li><b>Ambrosia:</b> zona industrial y de actividad local.</li></ul><p className="gta-source-note">Los nombres y detalles del mundo se basan en la información y materiales publicados por Rockstar Games. La exploración completa puede revelar más lugares y actividades.</p></div></section>
+  const goToPay = () => document.getElementById("comprar")?.scrollIntoView({ behavior: "smooth" });
 
-  <section className="gta-gallery" id="galeria"><div className="gta-section-heading"><div><span className="gta-kicker">04 — IMÁGENES DEL VIDEOJUEGO</span><h2>POSTALES DE <em>LEONIDA.</em></h2></div><a href="https://www.rockstargames.com/VI/media" target="_blank" rel="noreferrer">MEDIA OFICIAL <ArrowRight size={15}/></a></div><div className="gta-shot-grid">{shots.map((s,i)=><figure className={"gta-shot shot-"+i} key={s.label}><img src={s.src} alt={s.alt}/><figcaption><span>0{i+1}</span>{s.label}</figcaption></figure>)}</div></section>
+  return (
+    <main className="store-page">
+      <div className="store-topline">GTA 6 MÓVILES <span>EDICIÓN DIGITAL PARA ANDROID</span><span className="top-status">VENTA DIGITAL</span></div>
+      <header className="store-header">
+        <a className="store-brand" href="#inicio"><span className="store-brand-icon"><Gamepad2 size={23}/></span><span>GTA 6 <b>MÓVILES</b><small>EXPERIENCIA DIGITAL ANDROID</small></span></a>
+        <nav><a href="#detalles">DETALLES</a><a href="#requisitos">REQUISITOS</a><a href="#comprar">COMPRAR</a></nav>
+        <button className="store-nav-cta" onClick={goToPay}>OBTENER ACCESO <ArrowRight size={15}/></button>
+      </header>
 
-  <section className="gta-platforms"><div className="gta-detail-heading"><span>05 — PLATAFORMAS CONFIRMADAS</span><h2>¿DÓNDE SE PUEDE <em>JUGAR GTA VI?</em></h2><p>Según la información oficial de Rockstar Games consultada para esta guía:</p></div><div className="gta-platform-grid"><article><Gamepad2/><h3>PLAYSTATION 5</h3><p>Versión confirmada y disponible desde el 19 de noviembre de 2026.</p></article><article><Gamepad2/><h3>XBOX SERIES X|S</h3><p>Versión confirmada y disponible desde el 19 de noviembre de 2026.</p></article><article className="gta-platform-unconfirmed"><Smartphone/><h3>ANDROID / IOS</h3><p>Rockstar no ha anunciado una versión nativa oficial para teléfonos móviles.</p></article><article className="gta-platform-unconfirmed"><Gamepad2/><h3>PC</h3><p>No afirmamos una fecha ni disponibilidad para PC sin un anuncio oficial de Rockstar.</p></article></div></section>
+      <section className="store-hero" id="inicio">
+        <div className="store-hero-image"/>
+        <div className="store-hero-overlay"/>
+        <div className="store-hero-content">
+          <div className="store-eyebrow"><span/> EDICIÓN DIGITAL · ANDROID</div>
+          <div className="store-roman">VI</div>
+          <h1>GRAND THEFT<br/><em>AUTO VI</em></h1>
+          <p className="store-lead">LEONIDA EN LA PALMA DE TU MANO.</p>
+          <p className="store-description">Descubre la propuesta digital para Android de GTA 6 Móviles. Consulta los detalles de esta edición y consigue acceso mediante un pago seguro procesado por PayPal.</p>
+          <div className="store-hero-actions"><button onClick={goToPay} className="store-primary">COMPRAR POR US$5 <ArrowRight size={17}/></button><a href="#detalles" className="store-secondary">VER DETALLES <ArrowDown size={15}/></a></div>
+          <div className="store-hero-foot"><span><ShieldCheck size={15}/> PAGO PROCESADO POR PAYPAL</span><span><Smartphone size={15}/> PARA ANDROID</span></div>
+        </div>
+        <div className="store-hero-caption">VICE CITY / LEONIDA</div>
+      </section>
 
-  <section className="gta-android" id="android"><div className="gta-android-bg"/><div className="gta-android-copy"><div className="gta-kicker">06 — ARCHIVO PARA ANDROID</div><h2>INFORMACIÓN<br/><em>DE LA DESCARGA.</em></h2><p>En esta sección se publicará el archivo que facilite el administrador, junto con su tamaño, formato, versión, requisitos y pasos de instalación. El enlace se activará después de subirlo y verificar el contenido. No se trata de una aplicación oficial distribuida por Rockstar Games.</p><div className="gta-download-panel"><div className="gta-download-icon"><Smartphone size={25}/></div><div className="gta-download-info"><b>ARCHIVO ANDROID</b><span>Enlace pendiente de publicación y revisión</span></div><span className="gta-status">PENDIENTE</span></div><div className="gta-android-note"><ShieldAlert size={17}/><span>Importante: GTA VI no tiene versión oficial nativa para Android anunciada por Rockstar. No instales archivos desconocidos sin verificar su origen, firma, permisos y seguridad. La descarga no debe presentarse como GTA VI oficial ni como producto de Rockstar.</span></div></div><div className="gta-phone-art"><div className="gta-phone-frame"><img src={shots[1].src} alt="Vice City en GTA VI"/><div className="gta-phone-overlay"><span>GTA 6 MÓVILES</span><b>VICE CITY<br/>INFORMACIÓN</b><small>GUÍA INDEPENDIENTE</small></div></div></div></section>
+      <section className="store-value" id="detalles">
+        <div className="store-section-tag">01 / LA EXPERIENCIA</div>
+        <div className="store-value-copy"><span className="store-kicker">GTA 6 MÓVILES</span><h2>UNA NUEVA FORMA<br/>DE LLEVAR <em>LA ACCIÓN.</em></h2><p>Esta página ofrece una edición digital para Android distribuida de forma independiente. Antes de comprar, revisa los requisitos y la información técnica que acompañan al archivo. La disponibilidad y el funcionamiento dependen de la compatibilidad real de tu dispositivo.</p><div className="store-feature-row"><div><CheckCircle2/><b>Compra digital</b><small>Pago online con PayPal</small></div><div><Smartphone/><b>Enfoque Android</b><small>Consulta compatibilidad</small></div><div><Download/><b>Acceso digital</b><small>Tras confirmar el pago</small></div></div></div>
+        <div className="store-art-card"><img src="https://www.rockstargames.com/VI/_next/static/media/Vice_City_13.0iq8ff474tsdx.jpg?akim=1&imdensity=1&imwidth=1600" alt="Paisaje de Vice City"/><span>VICE CITY · LEONIDA</span></div>
+      </section>
 
-  <section className="gta-faq-section" id="preguntas"><div className="gta-detail-heading"><span>07 — CENTRO DE AYUDA</span><h2>PREGUNTAS <em>FRECUENTES.</em></h2><p>Respuestas claras sobre la fecha, plataformas, personajes y disponibilidad móvil de Grand Theft Auto VI.</p></div><div className="gta-faq-list">{faqs.map(([q,a])=><details key={q}><summary>{q}<span>+</span></summary><p>{a}</p></details>)}</div></section>
+      <section className="store-details-band" id="requisitos">
+        <div><span className="store-kicker">02 / ANTES DE COMPRAR</span><h2>REVISA LOS<br/><em>DETALLES.</em></h2><p>Para evitar compras equivocadas, comprueba que tu móvil cumple los requisitos publicados por el distribuidor y que dispones de espacio suficiente. No se debe asumir compatibilidad universal con todos los teléfonos Android.</p></div>
+        <div className="store-checklist"><div><span>01</span><p><b>Compatibilidad</b><small>Confirma versión de Android y modelo admitido en la ficha técnica del archivo.</small></p></div><div><span>02</span><p><b>Almacenamiento</b><small>Verifica el tamaño final de la descarga y el espacio libre necesario.</small></p></div><div><span>03</span><p><b>Conexión</b><small>Usa una conexión estable para descargar el contenido digital.</small></p></div><div><span>04</span><p><b>Distribución independiente</b><small>Esta tienda no está afiliada ni representa a Rockstar Games.</small></p></div></div>
+      </section>
 
-  <section className="gta-sources"><div><span className="gta-kicker">FUENTES Y VERIFICACIÓN</span><h2>INFORMACIÓN BASADA EN <em>FUENTES OFICIALES.</em></h2><p>Los datos del juego se contrastan con el sitio oficial de Rockstar Games y su centro de soporte. Actualizaremos esta guía cuando se publiquen anuncios verificables.</p></div><div className="gta-source-links"><a href="https://www.rockstargames.com/VI" target="_blank" rel="noreferrer">Página oficial de GTA VI <ExternalLink size={14}/></a><a href="https://support.rockstargames.com/" target="_blank" rel="noreferrer">Soporte oficial Rockstar Games <ExternalLink size={14}/></a><a href="https://www.rockstargames.com/newswire" target="_blank" rel="noreferrer">Rockstar Newswire <ExternalLink size={14}/></a></div></section>
-  <section className="gta-final"><span className="gta-kicker">GTA 6 MÓVILES · GUÍA INDEPENDIENTE</span><h2>TODO SOBRE<br/><em>GRAND THEFT AUTO VI.</em></h2><button className="gta-main-btn" onClick={()=>scrollTo("juego")}>VOLVER AL PRINCIPIO <ArrowRight size={17}/></button></section>
-  <footer className="gta-footer"><a className="gta-logo" href="#top"><span className="gta-logo-icon"><Gamepad2 size={20}/></span><span>GTA 6 <b>MÓVILES</b><small>NOTICIAS · GUÍAS · INFORMACIÓN</small></span></a><p>Información independiente en español para la comunidad de jugadores.</p><div className="gta-footer-legal">GTA, GRAND THEFT AUTO VI, VICE CITY Y LOS ELEMENTOS RELACIONADOS SON MARCAS Y PROPIEDAD DE TAKE-TWO INTERACTIVE / ROCKSTAR GAMES. ESTE SITIO ES INDEPENDIENTE, NO ESTÁ AFILIADO, PATROCINADO NI APROBADO POR ROCKSTAR GAMES.</div><div className="gta-footer-bottom"><span>© 2026 GTA 6 MÓVILES</span><a href="https://www.rockstargames.com/VI" target="_blank" rel="noreferrer">VISITAR ROCKSTAR GAMES ↗</a></div></footer>
- </main>
+      <section className="store-buy" id="comprar">
+        <div className="store-buy-copy"><span className="store-kicker">03 / ACCESO DIGITAL</span><h2>HAZLO TUYO<br/><em>POR US$5.</em></h2><p>Precio especial de lanzamiento para esta oferta digital.</p><div className="store-price"><span>US$</span><b>5</b><small>USD · PAGO ÚNICO</small></div><ul><li><CheckCircle2/> Pago procesado por PayPal</li><li><CheckCircle2/> Compra digital</li><li><CheckCircle2/> Revisa los requisitos antes de pagar</li></ul></div>
+        <div className="store-checkout"><div className="store-checkout-head"><ShieldCheck/><div><b>CHECKOUT SEGURO</b><small>Completa tu pago con PayPal</small></div></div><div id="paypal-container-G9SNDRRG5PDZN" className="paypal-hosted"><div className="paypal-loading">Cargando opciones de pago de PayPal…</div></div><p className="store-paypal-note">El importe definitivo lo determina la configuración del botón alojado en PayPal. Confirma que ese botón esté configurado en US$5 antes de aceptar pagos.</p></div>
+      </section>
+
+      <section className="store-delivery"><Zap/><div><b>IMPORTANTE SOBRE LA ENTREGA</b><p>El botón de PayPal procesa el pago, pero esta página todavía no valida automáticamente la transacción ni libera una descarga protegida. No se mostrará un enlace de descarga hasta configurar la confirmación del pago y la entrega segura del archivo.</p></div></section>
+
+      <footer className="store-footer"><a className="store-brand" href="#inicio"><span className="store-brand-icon"><Gamepad2 size={20}/></span><span>GTA 6 <b>MÓVILES</b><small>EDICIÓN DIGITAL INDEPENDIENTE</small></span></a><p>Distribución independiente. No afiliada, patrocinada ni aprobada por Rockstar Games o Take-Two Interactive.</p><small>Grand Theft Auto, GTA y los elementos relacionados son marcas de sus respectivos propietarios. Las imágenes promocionales pertenecen a sus titulares y se muestran con fines de identificación editorial.</small></footer>
+    </main>
+  );
 }
