@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const COOKIE = "redflix_admin";
 function signature(value: string) {
-  const secret = process.env.ADMIN_SESSION_SECRET;
+  const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD;
   if (!secret) throw new Error("Falta configurar ADMIN_SESSION_SECRET.");
   return createHmac("sha256", secret).update(value).digest("hex");
 }
