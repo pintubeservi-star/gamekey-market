@@ -129,6 +129,13 @@ export default function Home() {
       if (remoteProfiles?.length) {
         const mapped = remoteProfiles.map((p:any) => ({id:p.id,name:p.name,language:p.language,is_kids:p.is_kids,maturity:p.maturity,avatar:p.avatar}));
         setProfiles(mapped); localStorage.setItem("redflix-profiles",JSON.stringify(mapped));
+      } else {
+        const local = JSON.parse(localStorage.getItem("redflix-profiles") || "[]") as ViewerProfile[];
+        if (local.length) {
+          const migrated = local.map((p) => ({...p,id:crypto.randomUUID()}));
+          const {error:profileError} = await supabase.from("redflix_viewer_profiles").insert(migrated.map((p)=>({id:p.id,user_id:user.id,name:p.name,language:p.language,is_kids:p.is_kids,maturity:p.maturity,avatar:p.avatar})));
+          if (!profileError && alive) { setProfiles(migrated); localStorage.setItem("redflix-profiles",JSON.stringify(migrated)); }
+        }
       }
       if (remoteList) {
         const ids = remoteList.map((row:any)=>row.title_id);
