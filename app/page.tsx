@@ -246,7 +246,7 @@ export default function Home() {
             <MovieRow title={category==="Mi lista"?"Mi lista":category} items={visibleTitles} onSelect={setSelected} onPlay={openPlayer}/>}
           {visibleTitles.length===0 && <div className="empty-state"><Clapperboard size={35}/><b>No encontramos títulos</b><span>Prueba otra búsqueda o categoría.</span></div>}
         </section>
-        <footer className="browse-footer">REDFLIX <span>Entretenimiento en cualquier pantalla</span><button onClick={()=>setView("account")}>Cuenta y configuración</button><a href="/admin">Administración</a></footer>
+        <footer className="browse-footer">REDFLIX <span>Entretenimiento en cualquier pantalla</span><button onClick={()=>setView("account")}>Cuenta y configuración</button></footer>
       </>}
 
       {view === "account" && <section className="account-screen">
