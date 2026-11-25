@@ -129,12 +129,13 @@ export default function Home() {
       if (remoteProfiles?.length) {
         const mapped = remoteProfiles.map((p:any) => ({id:p.id,name:p.name,language:p.language,is_kids:p.is_kids,maturity:p.maturity,avatar:p.avatar}));
         setProfiles(mapped); localStorage.setItem("redflix-profiles",JSON.stringify(mapped));
+        if (activeProfile && !mapped.some((p:ViewerProfile)=>p.id===activeProfile.id)) setActiveProfile(mapped[0] ?? null);
       } else {
         const local = JSON.parse(localStorage.getItem("redflix-profiles") || "[]") as ViewerProfile[];
         if (local.length) {
           const migrated = local.map((p) => ({...p,id:crypto.randomUUID()}));
           const {error:profileError} = await supabase.from("redflix_viewer_profiles").insert(migrated.map((p)=>({id:p.id,user_id:user.id,name:p.name,language:p.language,is_kids:p.is_kids,maturity:p.maturity,avatar:p.avatar})));
-          if (!profileError && alive) { setProfiles(migrated); localStorage.setItem("redflix-profiles",JSON.stringify(migrated)); }
+          if (!profileError && alive) { setProfiles(migrated); localStorage.setItem("redflix-profiles",JSON.stringify(migrated)); if (activeProfile) setActiveProfile(migrated[0] ?? null); }
         }
       }
       if (remoteList) {
@@ -144,7 +145,7 @@ export default function Home() {
     };
     void sync();
     return () => { alive = false; };
-  }, [supabase,sessionEmail]);
+  }, [supabase,sessionEmail,activeProfile]);
   const toggleList = async (item: Title) => {
     const exists = watchlist.includes(item.id);
     const next = exists ? watchlist.filter((id) => id !== item.id) : [...watchlist,item.id];
