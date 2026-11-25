@@ -1,0 +1,11 @@
+{
+  "name": "REDFLIX",
+  "short_name": "REDFLIX",
+  "description": "Películas y series en un solo lugar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#141414",
+  "lang": "es",
+  "icons": []
+}
