@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1080">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#241b2b"/><stop offset=".48" stop-color="#d36a36"/><stop offset="1" stop-color="#f5b45d"/></linearGradient>
+ <radialGradient id="sun"><stop stop-color="#fff6c8"/><stop offset=".28" stop-color="#ffd47b"/><stop offset="1" stop-color="#f58c3c" stop-opacity="0"/></radialGradient>
+ <linearGradient id="robe" x2="1" y2="1"><stop stop-color="#e8d7b8"/><stop offset="1" stop-color="#9c826b"/></linearGradient>
+ <linearGradient id="cloak" x2="1" y2="1"><stop stop-color="#7b1720"/><stop offset="1" stop-color="#260d18"/></linearGradient>
+ <linearGradient id="shade" x2="0" y2="1"><stop stop-color="#090910" stop-opacity="0"/><stop offset=".62" stop-color="#090910" stop-opacity=".28"/><stop offset="1" stop-color="#090910"/></linearGradient>
+</defs>
+<rect width="720" height="1080" fill="url(#sky)"/>
+<circle cx="520" cy="420" r="260" fill="url(#sun)"/>
+<path d="M0 470 Q120 390 230 455 T470 420 T720 455 V760 H0Z" fill="#6b3d32" opacity=".45"/>
+<path d="M0 570 L90 505 155 560 235 485 310 560 400 490 485 555 575 470 720 555 V850 H0Z" fill="#50352f"/>
+<g fill="#342b2c" opacity=".9">
+ <path d="M410 625h18v-95h-18zM385 555h68v13h-68z"/>
+ <path d="M505 625h14v-75h-14zM486 565h52v11h-52z"/>
+ <path d="M595 625h14v-70h-14zM577 566h50v10h-50z"/>
+</g>
+<path d="M0 690 Q160 625 300 700 T720 660 V1080 H0Z" fill="#302421"/>
+<path d="M0 780 Q170 700 330 790 T720 735 V1080 H0Z" fill="#483027"/>
+<g fill="#171719"><path d="M0 0 Q100 45 130 180 Q65 125 0 145Z"/><path d="M0 120 Q105 120 160 255 Q70 210 0 250Z"/><path d="M0 240 Q95 215 130 350 Q65 310 0 370Z"/></g>
+<g fill="#27201d"><path d="M95 1080 Q120 850 200 770 Q140 920 155 1080Z"/><path d="M120 1080 Q205 875 270 830 Q210 970 210 1080Z"/></g>
+<!-- Jesús visto de espaldas -->
+<path d="M248 1080 Q235 870 250 690 Q260 580 305 520 Q345 490 390 525 Q445 585 465 710 Q495 890 515 1080Z" fill="url(#robe)"/>
+<path d="M330 515 Q390 500 425 555 Q485 650 500 790 Q450 850 405 865 Q380 720 340 650 Q315 595 330 515Z" fill="url(#cloak)"/>
+<path d="M276 590 Q235 700 235 850 L205 1080 H300 Q310 860 335 735Z" fill="#bca88e"/>
+<path d="M315 520 Q330 490 365 480 Q405 488 422 525 Q420 565 385 585 Q340 574 315 520Z" fill="#201a1a"/>
+<path d="M318 506 Q360 465 415 505 L428 525 Q368 548 308 525Z" fill="none" stroke="#4b3426" stroke-width="9" stroke-linecap="round"/>
+<path d="M345 488 Q365 456 397 475 M330 500 Q370 475 420 500 M338 514 Q375 490 425 512" fill="none" stroke="#5b3b2b" stroke-width="5"/>
+<path d="M0 1080 Q180 1000 360 1030 T720 1000 V1080Z" fill="#100f14" opacity=".55"/>
+<rect width="720" height="1080" fill="url(#shade)"/>
+<g fill="#fff4df" font-family="Arial,sans-serif" text-anchor="middle">
+ <text x="360" y="115" font-size="22" letter-spacing="8" opacity=".9">REDFLIX PRESENTA</text>
+ <text x="360" y="875" font-size="62" font-weight="800" letter-spacing="1">LA ÚLTIMA</text>
+ <text x="360" y="945" font-size="62" font-weight="800" letter-spacing="1">SEMANA DE JESÚS</text>
+ <text x="360" y="990" font-size="18" letter-spacing="5" opacity=".9">FE · SACRIFICIO · ESPERANZA</text>
+</g>
+</svg>
