@@ -36,6 +36,7 @@ export default function Home() {
   const [view,setView] = useState<"profiles"|"browse"|"account">("profiles");
   const [manage,setManage] = useState(false);
   const [editing,setEditing] = useState<ViewerProfile | null>(null);
+  const [profileModalOpen,setProfileModalOpen] = useState(false);
   const [profileName,setProfileName] = useState("");
   const [profileKids,setProfileKids] = useState(false);
   const [profileMaturity,setProfileMaturity] = useState("ALL");
@@ -92,16 +93,16 @@ export default function Home() {
     localStorage.setItem("redflix-profiles",JSON.stringify(next));
   };
   const openEditor = (profile?: ViewerProfile) => {
-    setEditing(profile ?? null); setProfileName(profile?.name ?? ""); setProfileKids(profile?.is_kids ?? false);
+    setProfileModalOpen(true); setEditing(profile ?? null); setProfileName(profile?.name ?? ""); setProfileKids(profile?.is_kids ?? false);
     setProfileMaturity(profile?.maturity ?? "ALL"); setProfileLang(profile?.language ?? "Español (Latinoamérica)");
     setAvatar(profile?.avatar ?? avatars[0]);
   };
   const saveProfile = async () => {
     const name = profileName.trim();
     if (!name) { setToast("Escribe un nombre para el perfil"); return; }
-    const nextProfile: ViewerProfile = { id:editing?.id ?? crypto.randomUUID(), name, language:profileLang, is_kids:profileKids, maturity:profileKids ? "7+" : profileMaturity, avatar };
+    const nextProfile: ViewerProfile = { id:editing && !editing.id.startsWith("local-") ? editing.id : crypto.randomUUID(), name, language:profileLang, is_kids:profileKids, maturity:profileKids ? "7+" : profileMaturity, avatar };
     const next = editing ? profiles.map((p) => p.id === editing.id ? nextProfile : p) : [...profiles,nextProfile];
-    saveProfiles(next); setEditing(null); setToast("Perfil guardado");
+    saveProfiles(next); setEditing(null); setProfileModalOpen(false); setToast("Perfil guardado");
     if (supabase && sessionEmail) {
       const {data:{user}} = await supabase.auth.getUser();
       if (user) {
@@ -114,6 +115,29 @@ export default function Home() {
     saveProfiles(profiles.filter((p) => p.id !== id)); setEditing(null); setToast("Perfil eliminado");
   };
   const chooseProfile = (profile: ViewerProfile) => { setActiveProfile(profile); setView("browse"); setManage(false); };
+  useEffect(() => {
+    if (!supabase || !sessionEmail) return;
+    let alive = true;
+    const sync = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const [{data:remoteProfiles},{data:remoteList}] = await Promise.all([
+        supabase.from("redflix_viewer_profiles").select("*").eq("user_id",user.id).order("created_at"),
+        supabase.from("redflix_watchlist").select("title_id").eq("user_id",user.id)
+      ]);
+      if (!alive) return;
+      if (remoteProfiles?.length) {
+        const mapped = remoteProfiles.map((p:any) => ({id:p.id,name:p.name,language:p.language,is_kids:p.is_kids,maturity:p.maturity,avatar:p.avatar}));
+        setProfiles(mapped); localStorage.setItem("redflix-profiles",JSON.stringify(mapped));
+      }
+      if (remoteList) {
+        const ids = remoteList.map((row:any)=>row.title_id);
+        setWatchlist(ids); localStorage.setItem("redflix-watchlist",JSON.stringify(ids));
+      }
+    };
+    void sync();
+    return () => { alive = false; };
+  }, [supabase,sessionEmail]);
   const toggleList = async (item: Title) => {
     const exists = watchlist.includes(item.id);
     const next = exists ? watchlist.filter((id) => id !== item.id) : [...watchlist,item.id];
@@ -133,7 +157,12 @@ export default function Home() {
     const result = authMode === "signin" ? await supabase.auth.signInWithPassword({email:userEmail,password}) : await supabase.auth.signUp({email:userEmail,password});
     setAuthMessage(result.error?.message ?? (authMode === "signin" ? "Sesión iniciada." : "Revisa tu correo para confirmar la cuenta."));
   };
-  const signOut = async () => { if (supabase) await supabase.auth.signOut(); setSessionEmail(null); setView("profiles"); setToast("Sesión cerrada"); };
+  const signOut = async () => { if (supabase) await supabase.auth.signOut(); setSessionEmail(null); setActiveProfile(null); setView("profiles"); setToast("Sesión cerrada"); };
+  const saveProgress = async (item:Title, seconds:number, completed=false) => {
+    if (!supabase || !sessionEmail || !activeProfile || item.id.startsWith("demo-")) return;
+    const {data:{user}} = await supabase.auth.getUser();
+    if (user) await supabase.from("redflix_watch_progress").upsert({user_id:user.id,viewer_profile_id:activeProfile.id,title_id:item.id,progress_seconds:Math.floor(seconds),completed,updated_at:new Date().toISOString()},{onConflict:"user_id,viewer_profile_id,title_id"});
+  };
   const openPlayer = (item: Title) => { setPlaying(item); setSelected(null); };
   const categories = ["Series","Películas","Novedades","Mi lista"];
   const rows = [
@@ -203,10 +232,10 @@ export default function Home() {
         </main>
       </section>}
 
-      {editing && <div className="modal-backdrop" onClick={()=>setEditing(null)}><section className="profile-modal" onClick={(e)=>e.stopPropagation()}>
-        <button className="modal-close" onClick={()=>setEditing(null)}><X/></button><h2>{editing?"Editar perfil":"Crear perfil"}</h2><div className="profile-form-grid"><div className="avatar-editor"><div className="avatar-preview" style={{background:avatar}}>{profileKids?"✦":(profileName||"R").slice(0,1).toUpperCase()}</div><div className="avatar-colors">{avatars.map((color)=><button key={color} style={{background:color}} className={avatar===color?"chosen":""} onClick={()=>setAvatar(color)} aria-label="Elegir avatar"/></div></div>
+      {profileModalOpen && <div className="modal-backdrop" onClick={()=>{setEditing(null);setProfileModalOpen(false);}}><section className="profile-modal" onClick={(e)=>e.stopPropagation()}>
+        <button className="modal-close" onClick={()=>{setEditing(null);setProfileModalOpen(false);}}><X/></button><h2>{editing?"Editar perfil":"Crear perfil"}</h2><div className="profile-form-grid"><div className="avatar-editor"><div className="avatar-preview" style={{background:avatar}}>{profileKids?"✦":(profileName||"R").slice(0,1).toUpperCase()}</div><div className="avatar-colors">{avatars.map((color)=><button key={color} style={{background:color}} className={avatar===color?"chosen":""} onClick={()=>setAvatar(color)} aria-label="Elegir avatar"/></div></div>
           <div className="profile-fields"><label>Nombre<input value={profileName} maxLength={20} onChange={(e)=>setProfileName(e.target.value)} placeholder="Nombre del perfil"/></label><label>Idioma<select value={profileLang} onChange={(e)=>setProfileLang(e.target.value)}><option>Español (Latinoamérica)</option><option>Español (España)</option><option>English</option><option>Português</option></select></label><label className="kids-check"><input type="checkbox" checked={profileKids} onChange={(e)=>setProfileKids(e.target.checked)}/><span><b>¿Perfil de niños?</b><small>Solo muestra títulos clasificados para menores de 12 años.</small></span></label><label>Clasificación por edad<select value={profileMaturity} disabled={profileKids} onChange={(e)=>setProfileMaturity(e.target.value)}><option value="ALL">Todos los niveles (18+)</option><option value="16+">16+ y menores</option><option value="13+">13+ y menores</option><option value="7+">7+ (Niños)</option></select></label></div></div>
-        <div className="modal-actions">{editing && <button className="danger-button" onClick={()=>removeProfile(editing.id)}>Eliminar perfil</button>}<button className="secondary-button" onClick={()=>setEditing(null)}>Cancelar</button><button className="save-button" onClick={saveProfile}>Guardar</button></div>
+        <div className="modal-actions">{editing && <button className="danger-button" onClick={()=>removeProfile(editing.id)}>Eliminar perfil</button>}<button className="secondary-button" onClick={()=>{setEditing(null);setProfileModalOpen(false);}}>Cancelar</button><button className="save-button" onClick={saveProfile}>Guardar</button></div>
       </section></div>}
 
       {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><section className="details-modal" onClick={(e)=>e.stopPropagation()}>
@@ -215,7 +244,7 @@ export default function Home() {
       </section></div>}
 
       {playing && <div className="player-backdrop"><div className="player-top"><b>REDFLIX <span>/{playing.title}</span></b><button onClick={()=>setPlaying(null)}><X/></button></div><div className="player-content">
-        {playing.video_url ? <video src={playing.video_url} controls autoPlay playsInline className="video-player"/> : <div className="player-placeholder"><Clapperboard size={54}/><h2>{playing.title}</h2><p>Este título todavía no tiene un archivo de reproducción conectado.</p><small>El administrador puede añadir el enlace de vídeo desde /admin.</small></div>}
+        {playing.video_url ? <video src={playing.video_url} controls autoPlay playsInline className="video-player" onPause={(e)=>void saveProgress(playing,e.currentTarget.currentTime)} onEnded={(e)=>void saveProgress(playing,e.currentTarget.currentTime,true)}/> : <div className="player-placeholder"><Clapperboard size={54}/><h2>{playing.title}</h2><p>Este título todavía no tiene un archivo de reproducción conectado.</p><small>El administrador puede añadir el enlace de vídeo desde /admin.</small></div>}
       </div></div>}
 
       {toast && <div className="toast-message"><Sparkles size={16}/>{toast}</div>}
