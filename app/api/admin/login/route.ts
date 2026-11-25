@@ -5,7 +5,7 @@ import { timingSafeEqual } from "crypto";
 export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   const configured = process.env.ADMIN_PASSWORD;
-  if (!configured || !process.env.ADMIN_SESSION_SECRET) return NextResponse.json({error:"El administrador todavía no está configurado en el servidor."},{status:503});
+  if (!configured) return NextResponse.json({error:"El administrador todavía no está configurado en el servidor."},{status:503});
   const body = await req.json().catch(()=>({}));
   const supplied = typeof body.password === "string" ? body.password : "";
   const a=Buffer.from(supplied), b=Buffer.from(configured);
