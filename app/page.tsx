@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bell, Check, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clapperboard,
   Edit3, Info, ListPlus, Lock, LogOut, Play, Plus, Search, Settings, Shield,
@@ -16,8 +16,8 @@ type Title = {
 };
 type ViewerProfile = { id: string; name: string; language: string; is_kids: boolean; maturity: string; avatar: string };
 const avatars = ["#e50914", "#087e8b", "#7b2cbf", "#e76f51", "#2a9d8f", "#457b9d"];
-const demoTitles: Title[] = [
-  { id:"demo-1", title:"Horizonte Carmesí", synopsis:"Una anomalía magnética deja aislada una estación espacial. La tripulación descubre que las señales que recibe desde la Tierra llegan desde diez años en el futuro.", category:"Ciencia ficción", content_type:"series", release_year:2026, maturity_rating:"16+", seasons:3, runtime_minutes:null, poster_url:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=650&q=85", hero_image_url:"https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1900&q=90", video_url:"", trailer_url:"", featured:true, published:true, tags:["Espacio","Misterio"] },
+const jesusFeature: Title = { id:"redflix-jesus-last-week", title:"La última semana de Jesús", synopsis:"Revive los acontecimientos decisivos de los últimos días de Jesús: su llegada a Jerusalén, las enseñanzas que marcaron a sus discípulos, la última cena, el juicio y el sacrificio en la cruz. Una historia de fe, entrega y esperanza.", category:"Drama bíblico", content_type:"movie", release_year:null, maturity_rating:"13+", seasons:null, runtime_minutes:null, poster_url:"/la-ultima-semana-de-jesus.svg", hero_image_url:"/la-ultima-semana-de-jesus.svg", video_url:"http://yuwc.swzablvpm.com/vod/4652C02F8DAA415983D66FCA4DCD7F46_media.ts", trailer_url:"", featured:true, published:true, tags:["Jesús","Biblia","Semana Santa","Drama histórico"] };\nconst demoTitles: Title[] = [\n  jesusFeature,
+  { id:"demo-1", title:"Horizonte Carmesí", synopsis:"Una anomalía magnética deja aislada una estación espacial. La tripulación descubre que las señales que recibe desde la Tierra llegan desde diez años en el futuro.", category:"Ciencia ficción", content_type:"series", release_year:2026, maturity_rating:"16+", seasons:3, runtime_minutes:null, poster_url:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=650&q=85", hero_image_url:"https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1900&q=90", video_url:"", trailer_url:"", featured:false, published:true, tags:["Espacio","Misterio"] },
   { id:"demo-2", title:"La última frontera", synopsis:"Un equipo de exploradores se adentra en un territorio que no aparece en ningún mapa.", category:"Aventura", content_type:"movie", release_year:2025, maturity_rating:"13+", seasons:null, runtime_minutes:118, poster_url:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=650&q=85", hero_image_url:"", video_url:"", trailer_url:"", featured:false, published:true, tags:["Aventura"] },
   { id:"demo-3", title:"Código Niebla", synopsis:"Una analista descubre un patrón oculto detrás de una serie de ataques digitales.", category:"Suspenso", content_type:"series", release_year:2026, maturity_rating:"16+", seasons:2, runtime_minutes:null, poster_url:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=650&q=85", hero_image_url:"", video_url:"", trailer_url:"", featured:false, published:true, tags:["Tecnología"] },
   { id:"demo-4", title:"Océano profundo", synopsis:"Una misión submarina encuentra una estructura que desafía todo lo conocido.", category:"Documental", content_type:"movie", release_year:2024, maturity_rating:"7+", seasons:null, runtime_minutes:92, poster_url:"https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=650&q=85", hero_image_url:"", video_url:"", trailer_url:"", featured:false, published:true, tags:["Naturaleza"] },
@@ -52,7 +52,7 @@ export default function Home() {
   const [authMode,setAuthMode] = useState<"signin"|"signup">("signin");
   const [authMessage,setAuthMessage] = useState("");
   const [sessionEmail,setSessionEmail] = useState<string | null>(null);
-  const [toast,setToast] = useState("");
+  const [toast,setToast] = useState("");\n  const [playerError,setPlayerError] = useState("");\n  const videoRef = useRef<HTMLVideoElement>(null);\n\n  useEffect(() => {\n    if (!playing?.video_url || !playing.video_url.toLowerCase().includes(".ts")) return;\n    let player: any = null;\n    let cancelled = false;\n    setPlayerError("");\n    import("mpegts.js").then(({ default: mpegts }) => {\n      if (cancelled) return;\n      if (!mpegts.isSupported() || !videoRef.current) { setPlayerError("Este navegador no admite la reproducción de este formato MPEG-TS."); return; }\n      player = mpegts.createPlayer({ type:"mpegts", url:playing.video_url, isLive:true }, { enableWorker:true, lazyLoad:false, stashInitialSize:128 });\n      player.attachMediaElement(videoRef.current);\n      player.on(mpegts.Events.ERROR, () => setPlayerError("No se pudo cargar el enlace. Puede estar vencido o el servidor puede bloquear la reproducción externa."));\n      player.load();\n      player.play().catch(() => setPlayerError("Toca reproducir para iniciar el video."));\n    }).catch(() => setPlayerError("No se pudo iniciar el reproductor MPEG-TS."));\n    return () => { cancelled = true; if (player) { player.pause(); player.unload(); player.detachMediaElement(); player.destroy(); } };\n  }, [playing]);
 
   useEffect(() => {
     try {
@@ -65,7 +65,7 @@ export default function Home() {
     supabase.auth.getSession().then(({data}) => setSessionEmail(data.session?.user.email ?? null));
     const { data: listener } = supabase.auth.onAuthStateChange((_event,session) => setSessionEmail(session?.user.email ?? null));
     supabase.from("redflix_titles").select("*").eq("published",true).order("created_at",{ascending:false})
-      .then(({data,error}) => { if (!error && data?.length) setTitles(data as Title[]); });
+      .then(({data,error}) => { if (!error && data?.length) setTitles([jesusFeature, ...(data as Title[]).filter((item) => item.id !== jesusFeature.id)]); });
     return () => listener.subscription.unsubscribe();
   }, [supabase]);
 
@@ -86,7 +86,7 @@ export default function Home() {
     const matchesCategory = category === "Inicio" || (category === "Series" ? item.content_type === "series" : category === "Películas" ? item.content_type === "movie" : category === "Mi lista" ? watchlist.includes(item.id) : category === "Novedades" ? (item.release_year ?? 0) >= 2025 : item.category === category);
     return matchesSearch && matchesCategory;
   });
-  const featured = allowedTitles.find((item) => item.featured) ?? allowedTitles[0];
+  const featured = allowedTitles.find((item) => item.id === jesusFeature.id) ?? allowedTitles.find((item) => item.featured) ?? allowedTitles[0];
 
   const saveProfiles = (next: ViewerProfile[]) => {
     setProfiles(next);
@@ -252,7 +252,7 @@ export default function Home() {
       </section></div>}
 
       {playing && <div className="player-backdrop"><div className="player-top"><b>REDFLIX <span>/{playing.title}</span></b><button onClick={()=>setPlaying(null)}><X/></button></div><div className="player-content">
-        {playing.video_url ? <video src={playing.video_url} controls autoPlay playsInline className="video-player" onPause={(e)=>void saveProgress(playing,e.currentTarget.currentTime)} onEnded={(e)=>void saveProgress(playing,e.currentTarget.currentTime,true)}/> : <div className="player-placeholder"><Clapperboard size={54}/><h2>{playing.title}</h2><p>Este título todavía no tiene un archivo de reproducción conectado.</p><small>El administrador puede añadir el enlace de vídeo desde /admin.</small></div>}
+        {playing.video_url ? <><video ref={videoRef} src={playing.video_url.toLowerCase().includes(".ts") ? undefined : playing.video_url} controls autoPlay playsInline className="video-player" onPause={(e)=>void saveProgress(playing,e.currentTarget.currentTime)} onEnded={(e)=>void saveProgress(playing,e.currentTarget.currentTime,true)}/>{playerError && <div className="player-error">{playerError}</div>}</> : <div className="player-placeholder"><Clapperboard size={54}/><h2>{playing.title}</h2><p>Este título todavía no tiene un archivo de reproducción conectado.</p><small>El administrador puede añadir el enlace de vídeo desde /admin.</small></div>}
       </div></div>}
 
       {toast && <div className="toast-message"><Sparkles size={16}/>{toast}</div>}
